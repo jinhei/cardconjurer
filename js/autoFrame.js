@@ -1705,3 +1705,168 @@ function autoFrame() {
 		}
 	}
 }
+
+
+/**
+ * Auto-frame a card after Scryfall import using Borderless frames.
+ * Reads card.importedColors, determines frame/crown/PT/mask, and applies.
+ */
+async function autoFrameFromScryfallImport() {
+    // 1. Get colors
+    var colors = card.importedColors || [];
+
+    // 2. Sort by WUBRG priority
+    var priority = { W: 0, U: 1, B: 2, R: 3, G: 4 };
+    colors.sort(function(a, b) { return (priority[a] ?? 5) - (priority[b] ?? 5); });
+    colors = colors.filter(function(c) { return 'WUBRG'.includes(c); });
+
+    // 3. Determine card properties from imported data
+    var typeLine = (card.importedTypeLine || '').toLowerCase();
+    var isLegendary = typeLine.includes('legendary');
+    var isLand = typeLine.includes('land');
+    var hasPT = card.importedPower !== undefined && card.importedPower !== '' && card.importedPower !== null;
+
+    // 4. For lands, use color_identity instead of colors
+    if (isLand && (card.importedColorIdentity || []).length > 0) {
+        colors = card.importedColorIdentity.filter(function(c) { return 'WUBRG'.includes(c); });
+        colors.sort(function(a, b) { return (priority[a] ?? 5) - (priority[b] ?? 5); });
+    }
+
+    // 5. Determine frame letter, crown letter, PT letter, right half
+    var frameLetter, crownLetter, ptLetter, maskRightHalf = false;
+
+    if (colors.length >= 3) {
+        frameLetter = 'M'; crownLetter = 'M'; ptLetter = 'M';
+    } else if (colors.length === 2) {
+        frameLetter = colors[0]; crownLetter = colors[0]; // Primary color
+        ptLetter = colors[1]; // Secondary color (right side)
+        maskRightHalf = true;
+    } else if (colors.length === 1) {
+        frameLetter = colors[0]; crownLetter = colors[0]; ptLetter = colors[0];
+    } else if (isLand) {
+        frameLetter = 'L'; crownLetter = 'L'; ptLetter = 'C';
+    } else {
+        frameLetter = 'A'; crownLetter = 'A'; ptLetter = 'A';
+    }
+
+    // Debug log
+    console.log('[autoFrame] colors:', colors, 'frame:', frameLetter, 'crown:', crownLetter, 'pt:', ptLetter, 'rightHalf:', maskRightHalf, 'legendary:', isLegendary, 'land:', isLand);
+
+    // 6. Switch to borderless version
+    await resetCardIrregularities();
+    card.version = 'borderless';
+    card.artBounds = {x:0, y:0, width:1, height:0.9224};
+    autoFitArt();
+    card.setSymbolBounds = {x:0.9213, y:0.5910, width:0.12, height:0.0410, vertical:'center', horizontal:'right'};
+    resetSetSymbol();
+    card.watermarkBounds = {x:0.5, y:0.7762, width:0.75, height:0.2305};
+    resetWatermark();
+
+    // 7. Build frame layers
+    await buildBorderlessFrame(frameLetter, crownLetter, ptLetter, maskRightHalf, isLegendary, hasPT);
+}
+
+/**
+ * Build and apply borderless frame layers.
+ */
+async function buildBorderlessFrame(frameLetter, crownLetter, ptLetter, maskRightHalf, isLegendary, hasPT) {
+    // Ensure borderless pack is loaded
+    if (autoFramePack !== 'Borderless') {
+        loadScript('/js/frames/packBorderless.js');
+        autoFramePack = 'Borderless';
+    }
+
+    // Clear existing frames
+    card.frames = [];
+    var frameListEl = document.querySelector('#frame-list');
+    if (frameListEl) frameListEl.innerHTML = null;
+
+    var L = frameLetter.toUpperCase();
+    var CL = crownLetter.toUpperCase();
+    var PL = ptLetter.toUpperCase();
+
+    // --- Legendary Crown (bottom layer) ---
+    if (isLegendary) {
+        if (maskRightHalf) {
+            // Two-color: right half crown first (bottom), then primary (top)
+            var secCrown = ptLetter.toUpperCase();
+            card.frames.push({
+                name: secCrown + ' Crown (Right Half)',
+                src: '/img/frames/m15/crowns/m15Crown' + secCrown + 'Floating.png',
+                masks: [{src:'/img/frames/maskRightHalf.png', name:'Right Half'}],
+                bounds: {x:0.0307, y:0.0191, width:0.9387, height:0.1024}
+            });
+            card.frames.push({
+                name: CL + ' Crown (Primary)',
+                src: '/img/frames/m15/crowns/m15Crown' + CL + 'Floating.png',
+                masks: [],
+                bounds: {x:0.0307, y:0.0191, width:0.9387, height:0.1024}
+            });
+        } else {
+            card.frames.push({
+                name: CL + ' Legend Crown',
+                src: '/img/frames/m15/crowns/m15Crown' + CL + 'Floating.png',
+                masks: [],
+                bounds: {x:0.0307, y:0.0191, width:0.9387, height:0.1024}
+            });
+        }
+        // Crown outline (borderless needs this for visual outline around crown)
+        card.frames.push({
+            name: 'Legend Crown Outline',
+            src: '/img/frames/m15/crowns/m15CrownFloatingOutline.png',
+            masks: [],
+            bounds: {x:0.028, y:0.0172, width:0.944, height:0.1062}
+        });
+        // Crown border cover (erase mode for borderless)
+        card.frames.push({
+            name: 'Legend Crown Border Cover',
+            src: '/img/black.png',
+            masks: [],
+            bounds: {x:0, y:0, width:1, height:137/2814},
+            erase: true
+        });
+    }
+
+    // --- PT Box ---
+    if (hasPT) {
+        card.frames.push({
+            name: PL + ' Power/Toughness',
+            src: '/img/frames/m15/borderless/pt/' + PL.toLowerCase() + '.png',
+            masks: [],
+            bounds: {x:1146/1500, y:1861/2100, width:274/1500, height:140/2100}
+        });
+    }
+
+    // --- Main Frame ---
+    if (maskRightHalf) {
+        // Two-color: right half first (bottom), then primary (top)
+        var secLetter = ptLetter.toUpperCase();
+        card.frames.push({
+            name: secLetter + ' Frame (Right Half)',
+            src: '/img/frames/m15/borderless/m15GenericShowcaseFrame' + secLetter + '.png',
+            masks: [{src:'/img/frames/maskRightHalf.png', name:'Right Half'}],
+            bounds: {x:0, y:0, width:1, height:1}
+        });
+        card.frames.push({
+            name: L + ' Frame (Primary)',
+            src: '/img/frames/m15/borderless/m15GenericShowcaseFrame' + L + '.png',
+            masks: [],
+            bounds: {x:0, y:0, width:1, height:1}
+        });
+    } else {
+        card.frames.push({
+            name: L + ' Frame',
+            src: '/img/frames/m15/borderless/m15GenericShowcaseFrame' + L + '.png',
+            masks: [],
+            bounds: {x:0, y:0, width:1, height:1}
+        });
+    }
+
+    // Apply frames
+    document.querySelector('#frame-list').innerHTML = null;
+    for (const item of card.frames) {
+		await addFrame([], item);
+    }
+    redrawFrames = true;
+    drawCard();
+}

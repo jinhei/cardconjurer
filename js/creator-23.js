@@ -860,6 +860,10 @@ function setAutoframeNyx(value) {
 	setAutoFrame();
 }
 
+function toggleImportAutoFrame() {
+	localStorage.setItem('importAutoFrame', document.querySelector('#importAutoFrame').checked);
+}
+
 var autoFramePack;
 
 async function addFrame(additionalMasks = [], loadingFrame = false) {
@@ -4456,6 +4460,16 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 	if (!document.querySelector('#lockSetSymbolURL').checked) {
 		fetchSetSymbol();
 	}
+
+	// Auto-frame based on Scryfall import data (borderless frames)
+	if (localStorage.getItem('importAutoFrame') === 'true' && typeof autoFrameFromScryfallImport === 'function') {
+		card.importedColors = cardToImport.colors || [];
+		card.importedColorIdentity = cardToImport.color_identity || [];
+		card.importedTypeLine = cardToImport.type_line || '';
+		card.importedPower = cardToImport.power;
+		card.importedToughness = cardToImport.toughness;
+		autoFrameFromScryfallImport();
+	}
 }
 function loadAvailableCards(cardKeys = JSON.parse(localStorage.getItem('cardKeys'))) {
 	if (!cardKeys) {
@@ -4975,7 +4989,11 @@ if (!localStorage.getItem('autoFrame')) {
 if (!localStorage.getItem('autoframe-always-nyx')) {
 	localStorage.setItem('autoframe-always-nyx', 'false');
 }
-document.querySelector('#autoframe-always-nyx').checked = localStorage.getItem('autoframe-always-nyx');
+document.querySelector('#autoframe-always-nyx').checked = localStorage.getItem('autoframe-always-nyx') === 'true';
+if (!localStorage.getItem('importAutoFrame')) {
+	localStorage.setItem('importAutoFrame', 'false');
+}
+document.querySelector('#importAutoFrame').checked = localStorage.getItem('importAutoFrame') === 'true';
 if (!localStorage.getItem('autoFit')) {
 	localStorage.setItem('autoFit', 'true');
 } else {

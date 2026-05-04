@@ -672,6 +672,10 @@
 								<input id='importAllPrints' type='checkbox' onchange="importChanged();">
 								<span class='checkmark'></span>
 							</label>
+							<label class='checkbox-container input margin-bottom'>Auto-set borderless frame on import
+								<input id='importAutoFrame' type='checkbox' onchange='toggleImportAutoFrame();'>
+								<span class='checkmark'></span>
+							</label>
 							<h5 class='padding margin-bottom input-description'>Select a specific card to import</h5>
 							<select class='input margin-bottom' id='import-index' onchange='changeCardIndex();' aria-label='Select specific card to import'></select>
 							<h5 class='padding input-description'>Select a language for card imports (not all languages will always be available)</h5>

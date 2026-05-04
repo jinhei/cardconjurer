@@ -997,6 +997,33 @@ function inputCardNameNumberTextImport(index) {
     inputCardArtName(beforeAfter(importCardTextResponse, '"name":"', '",'))
     manaCostUpdated()
     drawCardText()
+    // Extract colors for auto-frame
+    var colors = [];
+    console.log('[auto-frame] importCardTextResponse sample:', importCardTextResponse.substring(0, 200));
+    if (importCardTextResponse.includes('"colors":[')) {
+        colors = beforeAfter(importCardTextResponse, '"colors":[', ']').split(',').map(c => c.replace(/"/g, '')).filter(c => c.length > 0);
+        console.log('[auto-frame] extracted from colors:', colors);
+    }
+    if (colors.length === 0 && importCardTextResponse.includes('"color_identity":[')) {
+        colors = beforeAfter(importCardTextResponse, '"color_identity":[', ']').split(',').map(c => c.replace(/"/g, '')).filter(c => c.length > 0);
+        console.log('[auto-frame] extracted from color_identity:', colors);
+    }
+    if (colors.length === 0) {
+        var manaCost = beforeAfter(importCardTextResponse, '"mana_cost":"', '",');
+        colors = [...new Set(manaCost.toUpperCase().split('').filter(c => 'WUBRG'.includes(c)))];
+        console.log('[auto-frame] extracted from mana_cost:', colors);
+    }
+    card.importedColors = colors;
+    console.log('[auto-frame] card.importedColors:', card.importedColors);
+    console.log('[auto-frame] localStorage importAutoFrame:', localStorage.getItem('importAutoFrame'));
+    console.log('[auto-frame] autoFrameFromScryfallImport exists:', typeof autoFrameFromScryfallImport);
+    // Auto-frame based on Scryfall import data (borderless frames)
+    if (localStorage.getItem('importAutoFrame') === 'true' && typeof autoFrameFromScryfallImport === 'function') {
+        console.log('[auto-frame] calling autoFrameFromScryfallImport()');
+        autoFrameFromScryfallImport();
+    } else {
+        console.log('[auto-frame] SKIPPED: importAutoFrame=', localStorage.getItem('importAutoFrame'), 'func=', typeof autoFrameFromScryfallImport);
+    }
 }
 function importText(text, target) {
     for (var i = 0; i < cardTextList.length; i++) {
