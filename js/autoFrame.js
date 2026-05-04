@@ -314,7 +314,7 @@ function getFrameLetterConfig(frameType) {
 	const configs = {
 		'M15': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/m15/',
+			basePath: basePath + '/img/frames/m15/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {height: 0.1667, width: 0.9454, x: 0.0274, y: 0.0191},
@@ -352,7 +352,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'M15New': {
 			frameNames: extendedFrameNames,
-			basePath: '/img/frames/m15/',
+			basePath: basePath + '/img/frames/m15/',
 			bounds: {
 				crownBorderCover: {x:0, y:0, width:1, height:137/2814},
 				crown: {x:44/2010, y:53/2814, width:1922/2010, height:493/2814},
@@ -397,7 +397,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'M15Eighth': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/',
+			basePath: basePath + '/img/frames/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {height: 0.1667, width: 0.9454, x: 0.0274, y: 0.0191},
@@ -429,7 +429,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'M15EighthUB': {
 			frameNames: extendedFrameNames,
-			basePath: '/img/frames/',
+			basePath: basePath + '/img/frames/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {height: 0.1667, width: 0.9454, x: 0.0274, y: 0.0191},
@@ -467,7 +467,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'Borderless': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/',
+			basePath: basePath + '/img/frames/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {height: 0.1024, width: 0.9387, x: 0.0307, y: 0.0191},
@@ -496,7 +496,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'8thEdition': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/8th/',
+			basePath: basePath + '/img/frames/8th/',
 			bounds: {
 				pt: {x: 1461/2010, y: 2481/2814, width: 414/2010, height: 218/2814}
 			},
@@ -527,7 +527,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'ExtendedArt': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/',
+			basePath: basePath + '/img/frames/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {height: 0.1024, width: 0.9387, x: 0.0307, y: 0.0191},
@@ -571,7 +571,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'UB': {
 			frameNames: extendedFrameNames,
-			basePath: '/img/frames/m15/',
+			basePath: basePath + '/img/frames/m15/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {height: 0.1667, width: 0.9454, x: 0.0274, y: 0.0191},
@@ -602,7 +602,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'Circuit': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/',
+			basePath: basePath + '/img/frames/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {height: 0.1667, width: 0.9454, x: 0.0274, y: 0.0191},
@@ -631,7 +631,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'Etched': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/etched/',
+			basePath: basePath + '/img/frames/etched/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {x:0.0307, y:0.0191, width:0.9387, height:0.092},
@@ -659,7 +659,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'Phyrexian': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/m15/praetors/',
+			basePath: basePath + '/img/frames/m15/praetors/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {x: 0, y: 0, width: 1, height: 0.0476},
@@ -694,7 +694,7 @@ function getFrameLetterConfig(frameType) {
 				...standardFrameNames,
 				'ML': 'Multicolored Land' // Override
 			},
-			basePath: '/img/frames/seventh/',
+			basePath: basePath + '/img/frames/seventh/',
 			bounds: {},
 			pathBuilder: (letter, mask) => {
 				return `regular/${letter.toLowerCase()}.png`;
@@ -714,7 +714,7 @@ function getFrameLetterConfig(frameType) {
 				...standardFrameNames,
 				'bAlt': 'Black (Alt)'  // Special alternate black variant
 			},
-			basePath: '/img/frames/m15/japanShowcase/',
+			basePath: basePath + '/img/frames/m15/japanShowcase/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {height: 0.1667, width: 0.9454, x: 0.0274, y: 0.0191},
@@ -755,7 +755,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'Vault': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/vault/',
+			basePath: basePath + '/img/frames/vault/',
 			bounds: {
 				crown: {x: -88/2010, y: -80/2814, width: 2187/2010, height: 2975/2814},
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
@@ -800,7 +800,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'Adventure': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/adventure/',
+			basePath: basePath + '/img/frames/adventure/',
 			bounds: {
 				crownBorderCover: {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277},
 				crown: {height: 0.1667, width: 0.9454, x: 0.0274, y: 0.0191},
@@ -843,7 +843,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'Omen': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/omen/',
+			basePath: basePath + '/img/frames/omen/',
 			supportsCrown: true,
 			supportsPT: true,
 			supportsStamp: false,
@@ -894,7 +894,7 @@ function getFrameLetterConfig(frameType) {
 		},
 		'Prepare': {
 			frameNames: standardFrameNames,
-			basePath: '/img/frames/prepare/',
+			basePath: basePath + '/img/frames/prepare/',
 			supportsCrown: true,
 			supportsPT: true,
 			supportsStamp: false,
@@ -988,7 +988,7 @@ function makeFrameByLetterUnified(frameType, letter, mask = false, maskToRightHa
 	if (mask === "Crown Border Cover") {
 		return {
 			'name': 'Legend Crown Border Cover',
-			'src': '/img/black.png',
+			'src': basePath + '/img/black.png',
 			'masks': [],
 			'bounds': config.bounds.crownBorderCover || {height: 0.0177, width: 0.9214, x: 0.0394, y: 0.0277}
 		};
@@ -999,12 +999,12 @@ function makeFrameByLetterUnified(frameType, letter, mask = false, maskToRightHa
 		if (mask === "Legend Crown Outline" || mask === "Crown Outline") {
 			let frame = {
 				'name': 'Legend Crown Outline',
-				'src': '/img/frames/m15/crowns/m15CrownFloatingOutline.png',
+				'src': basePath + '/img/frames/m15/crowns/m15CrownFloatingOutline.png',
 				'masks': [],
 				'bounds': config.bounds.crownOutline
 			};
 			if (maskToRightHalf) {
-				frame.masks.push({'src': '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
+				frame.masks.push({'src': basePath + '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
 			}
 			return frame;
 		}
@@ -1019,7 +1019,7 @@ function makeFrameByLetterUnified(frameType, letter, mask = false, maskToRightHa
 			'bounds': config.bounds.crown
 		};
 		if (maskToRightHalf) {
-			frame.masks.push({'src': '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
+			frame.masks.push({'src': basePath + '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
 		}
 		return frame;
 	}
@@ -1033,7 +1033,7 @@ function makeFrameByLetterUnified(frameType, letter, mask = false, maskToRightHa
 			'bounds': config.bounds.innerCrown
 		};
 		if (maskToRightHalf) {
-			frame.masks.push({'src': '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
+			frame.masks.push({'src': basePath + '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
 		}
 		return frame;
 	}
@@ -1061,7 +1061,7 @@ function makeFrameByLetterUnified(frameType, letter, mask = false, maskToRightHa
 		};
 		
 		if (maskToRightHalf) {
-			frame.masks.push({'src': '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
+			frame.masks.push({'src': basePath + '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
 		}
 		return frame;
 	}
@@ -1089,7 +1089,7 @@ function makeFrameByLetterUnified(frameType, letter, mask = false, maskToRightHa
 			'bounds': config.bounds.stamp
 		};
 		if (maskToRightHalf) {
-			frame.masks.push({'src': '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
+			frame.masks.push({'src': basePath + '/img/frames/maskRightHalf.png', 'name': 'Right Half'});
 		}
 		return frame;
 	}
@@ -1144,7 +1144,7 @@ function makeFrameByLetterUnified(frameType, letter, mask = false, maskToRightHa
 			// Add right-half mask for multicolor cards (splits frame vertically)
 			if (maskToRightHalf) {
 				frame.masks.push({
-					'src': '/img/frames/maskRightHalf.png',
+					'src': basePath + '/img/frames/maskRightHalf.png',
 					'name': 'Right Half'
 				});
 			}
@@ -1351,7 +1351,7 @@ async function autoFrameUnified(frameType, colors, mana_cost, type_line, power) 
 		if (frameType === 'Borderless' || frameType === 'BorderlessUB' || frameType === 'M15BoxTopper' || frameType === 'M15ExtendedArtShort') {
 			frames.push({
 				'name': 'Legend Crown Outline',
-				'src': '/img/frames/m15/crowns/m15CrownFloatingOutline.png',
+				'src': basePath + '/img/frames/m15/crowns/m15CrownFloatingOutline.png',
 				'masks': [],
 				'bounds': {x:0.028, y:0.0172, width:0.944, height:0.1062}
 			});
@@ -1700,7 +1700,7 @@ function autoFrame() {
 		var packFrame = (frame == 'BorderlessUB') ? 'Borderless' : frame;
 		
 		if (autoFramePack != packFrame) {
-			loadScript('/js/frames/pack' + packFrame + '.js');
+			loadScript(basePath + '/js/frames/pack' + packFrame + '.js');
 			autoFramePack = packFrame;
 		}
 	}
@@ -1772,7 +1772,7 @@ async function autoFrameFromScryfallImport() {
 async function buildBorderlessFrame(frameLetter, crownLetter, ptLetter, maskRightHalf, isLegendary, hasPT) {
     // Ensure borderless pack is loaded
     if (autoFramePack !== 'Borderless') {
-        loadScript('/js/frames/packBorderless.js');
+        loadScript(basePath + '/js/frames/packBorderless.js');
         autoFramePack = 'Borderless';
     }
 
@@ -1792,20 +1792,20 @@ async function buildBorderlessFrame(frameLetter, crownLetter, ptLetter, maskRigh
             var secCrown = ptLetter.toUpperCase();
             card.frames.push({
                 name: secCrown + ' Crown (Right Half)',
-                src: '/img/frames/m15/crowns/m15Crown' + secCrown + 'Floating.png',
-                masks: [{src:'/img/frames/maskRightHalf.png', name:'Right Half'}],
+                src: basePath + '/img/frames/m15/crowns/m15Crown' + secCrown + 'Floating.png',
+                masks: [{src: basePath + '/img/frames/maskRightHalf.png', name:'Right Half'}],
                 bounds: {x:0.0307, y:0.0191, width:0.9387, height:0.1024}
             });
             card.frames.push({
                 name: CL + ' Crown (Primary)',
-                src: '/img/frames/m15/crowns/m15Crown' + CL + 'Floating.png',
+                src: basePath + '/img/frames/m15/crowns/m15Crown' + CL + 'Floating.png',
                 masks: [],
                 bounds: {x:0.0307, y:0.0191, width:0.9387, height:0.1024}
             });
         } else {
             card.frames.push({
                 name: CL + ' Legend Crown',
-                src: '/img/frames/m15/crowns/m15Crown' + CL + 'Floating.png',
+                src: basePath + '/img/frames/m15/crowns/m15Crown' + CL + 'Floating.png',
                 masks: [],
                 bounds: {x:0.0307, y:0.0191, width:0.9387, height:0.1024}
             });
@@ -1813,14 +1813,14 @@ async function buildBorderlessFrame(frameLetter, crownLetter, ptLetter, maskRigh
         // Crown outline (borderless needs this for visual outline around crown)
         card.frames.push({
             name: 'Legend Crown Outline',
-            src: '/img/frames/m15/crowns/m15CrownFloatingOutline.png',
+            src: basePath + '/img/frames/m15/crowns/m15CrownFloatingOutline.png',
             masks: [],
             bounds: {x:0.028, y:0.0172, width:0.944, height:0.1062}
         });
         // Crown border cover (erase mode for borderless)
         card.frames.push({
             name: 'Legend Crown Border Cover',
-            src: '/img/black.png',
+            src: basePath + '/img/black.png',
             masks: [],
             bounds: {x:0, y:0, width:1, height:137/2814},
             erase: true
@@ -1831,7 +1831,7 @@ async function buildBorderlessFrame(frameLetter, crownLetter, ptLetter, maskRigh
     if (hasPT) {
         card.frames.push({
             name: PL + ' Power/Toughness',
-            src: '/img/frames/m15/borderless/pt/' + PL.toLowerCase() + '.png',
+            src: basePath + '/img/frames/m15/borderless/pt/' + PL.toLowerCase() + '.png',
             masks: [],
             bounds: {x:1146/1500, y:1861/2100, width:274/1500, height:140/2100}
         });
@@ -1843,20 +1843,20 @@ async function buildBorderlessFrame(frameLetter, crownLetter, ptLetter, maskRigh
         var secLetter = ptLetter.toUpperCase();
         card.frames.push({
             name: secLetter + ' Frame (Right Half)',
-            src: '/img/frames/m15/borderless/m15GenericShowcaseFrame' + secLetter + '.png',
-            masks: [{src:'/img/frames/maskRightHalf.png', name:'Right Half'}],
+            src: basePath + '/img/frames/m15/borderless/m15GenericShowcaseFrame' + secLetter + '.png',
+            masks: [{src: basePath + '/img/frames/maskRightHalf.png', name:'Right Half'}],
             bounds: {x:0, y:0, width:1, height:1}
         });
         card.frames.push({
             name: L + ' Frame (Primary)',
-            src: '/img/frames/m15/borderless/m15GenericShowcaseFrame' + L + '.png',
+            src: basePath + '/img/frames/m15/borderless/m15GenericShowcaseFrame' + L + '.png',
             masks: [],
             bounds: {x:0, y:0, width:1, height:1}
         });
     } else {
         card.frames.push({
             name: L + ' Frame',
-            src: '/img/frames/m15/borderless/m15GenericShowcaseFrame' + L + '.png',
+            src: basePath + '/img/frames/m15/borderless/m15GenericShowcaseFrame' + L + '.png',
             masks: [],
             bounds: {x:0, y:0, width:1, height:1}
         });
