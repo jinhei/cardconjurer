@@ -4756,8 +4756,8 @@ function loadScript(scriptPath) {
 		notify('A script failed to load, likely due to an update. Please reload your page. Sorry for the inconvenience.');
 		reject();
 	}
-	script.setAttribute('src', scriptPath);
-	document.querySelectorAll('head')[0].appendChild(script);
+	script.setAttribute('src', (typeof basePath !== 'undefined' ? basePath : '') + scriptPath);
+		document.querySelectorAll('head')[0].appendChild(script);
 	});
 }
 // Stretchable SVGs
