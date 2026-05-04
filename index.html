@@ -3,10 +3,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<base href="{{ site.baseurl }}">
+	<base href="{{ site.baseurl }}/">
 	<script>
 		// Read base path from <base> tag, no trailing slash
-		var basePath = document.querySelector('base').href.replace(location.origin, '');
+		var basePath = document.querySelector('base').href.replace(location.origin, '').replace(/\/$/, '');
 	</script>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
