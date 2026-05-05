@@ -4,15 +4,15 @@
 
 availableFrames = [
     {   name: "Frame", 
-        src: "/img/frames/ghostfire/frame.png",
+        src: "img/frames/ghostfire/frame.png",
     },
     {
         name: "Power/Toughness",
-        src: "/img/frames/ghostfire/pt.png", bounds:{ y: -0.003, x: -0.001 },
+        src: "img/frames/ghostfire/pt.png", bounds:{ y: -0.003, x: -0.001 },
     },
     {
         name: "BorderlessFrame",
-        src: "/img/frames/ghostfire/bFrame.png",
+        src: "img/frames/ghostfire/bFrame.png",
     },
 ];
 //disables/enables the "Load Frame Version" button
