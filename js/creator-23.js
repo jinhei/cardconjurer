@@ -4756,7 +4756,10 @@ function loadScript(scriptPath) {
 			notify('A script failed to load, likely due to an update. Please reload your page. Sorry for the inconvenience.');
 			reject();
 		}
-		script.setAttribute('src', (typeof basePath !== 'undefined' ? basePath : '') + scriptPath);
+		let src = scriptPath.startsWith('http')
+			? scriptPath
+			: ((typeof basePath !== 'undefined' ? basePath : '') + '/' + scriptPath).replace(/\/\//g, '/');
+		script.setAttribute('src', src);
 		document.querySelectorAll('head')[0].appendChild(script);
 	});
 }
