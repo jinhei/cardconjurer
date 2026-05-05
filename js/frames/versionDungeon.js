@@ -1,6 +1,6 @@
 //checks to see if it needs to run
-if (!loadedVersions.includes('/js/frames/versionDungeon.js')) {
-	loadedVersions.push('/js/frames/versionDungeon.js');
+if (!loadedVersions.includes('js/frames/versionDungeon.js')) {
+	loadedVersions.push('js/frames/versionDungeon.js');
 	sizeCanvas('dungeon');
 	sizeCanvas('dungeonFX');
 	document.querySelector('#creator-menu-tabs').innerHTML += '<h3 class="selectable readable-background" onclick="toggleCreatorTabs(event, `dungeon`)">Dungeon</h3>';
@@ -24,37 +24,37 @@ if (!loadedVersions.includes('/js/frames/versionDungeon.js')) {
 		</select>
 	</div>`;
 	if (!card.dungeon) {
-		card.dungeon = {abilities:[1, 1, 1, 0], count:3, x:0.1, width:0.3947};
+		card.dungeon = { abilities: [1, 1, 1, 0], count: 3, x: 0.1, width: 0.3947 };
 	}
 	document.querySelector('#creator-menu-sections').appendChild(newHTML);
-	var dungeonFXtop = new Image(); setImageUrl(dungeonFXtop, '/img/frames/dungeon/walls/fx/top.png');
-	var dungeonFXleft = new Image(); setImageUrl(dungeonFXleft, '/img/frames/dungeon/walls/fx/left.png');
-	var dungeonFXbottom = new Image(); setImageUrl(dungeonFXbottom, '/img/frames/dungeon/walls/fx/bottom.png');
-	var dungeonFXright = new Image(); setImageUrl(dungeonFXright, '/img/frames/dungeon/walls/fx/right.png');
-	var dungeonFXtopright = new Image(); setImageUrl(dungeonFXtopright, '/img/frames/dungeon/walls/fx/topright.png');
-	var dungeonFXtopleft = new Image(); setImageUrl(dungeonFXtopleft, '/img/frames/dungeon/walls/fx/topleft.png');
-	var dungeonFXbottomright = new Image(); setImageUrl(dungeonFXbottomright, '/img/frames/dungeon/walls/fx/bottomright.png');
-	var dungeonFXbottomleft = new Image(); setImageUrl(dungeonFXbottomleft, '/img/frames/dungeon/walls/fx/bottomleft.png');
-	var dungeonShapetop = new Image(); setImageUrl(dungeonShapetop, '/img/frames/dungeon/walls/shape/top.png');
-	var dungeonShapeleft = new Image(); setImageUrl(dungeonShapeleft, '/img/frames/dungeon/walls/shape/left.png');
-	var dungeonShapebottom = new Image(); setImageUrl(dungeonShapebottom, '/img/frames/dungeon/walls/shape/bottom.png');
-	var dungeonShaperight = new Image(); setImageUrl(dungeonShaperight, '/img/frames/dungeon/walls/shape/right.png');
-	var dungeonShapetopright = new Image(); setImageUrl(dungeonShapetopright, '/img/frames/dungeon/walls/shape/topright.png');
-	var dungeonShapetopleft = new Image(); setImageUrl(dungeonShapetopleft, '/img/frames/dungeon/walls/shape/topleft.png');
-	var dungeonShapebottomright = new Image(); setImageUrl(dungeonShapebottomright, '/img/frames/dungeon/walls/shape/bottomright.png');
-	var dungeonShapebottomleft = new Image(); setImageUrl(dungeonShapebottomleft, '/img/frames/dungeon/walls/shape/bottomleft.png');
-	var dungeonDoorwayShape = new Image(); setImageUrl(dungeonDoorwayShape, '/img/frames/dungeon/walls/shape/doorway.png');
-	var dungeonDoorwayFX = new Image(); setImageUrl(dungeonDoorwayFX, '/img/frames/dungeon/walls/fx/doorway.png');
-	var dungeonDoorwayArrow = new Image(); setImageUrl(dungeonDoorwayArrow, '/img/frames/dungeon/walls/arrow.png');
-	var dungeonDoorwayCutout = new Image(); setImageUrl(dungeonDoorwayCutout, '/img/frames/dungeon/walls/doorway.png');
-	var dungeonOuterShape = new Image(); setImageUrl(dungeonOuterShape, '/img/frames/dungeon/walls/shape/outer.png');
-	var dungeonOuterFX = new Image(); setImageUrl(dungeonOuterFX, '/img/frames/dungeon/walls/fx/outer.png');
-	var dungeonTextureW = new Image(); setImageUrl(dungeonTextureW, '/img/frames/dungeon/walls/textures/w.png');
-	var dungeonTextureU = new Image(); setImageUrl(dungeonTextureU, '/img/frames/dungeon/walls/textures/u.png');
-	var dungeonTextureB = new Image(); setImageUrl(dungeonTextureB, '/img/frames/dungeon/walls/textures/b.png');
-	var dungeonTextureR = new Image(); setImageUrl(dungeonTextureR, '/img/frames/dungeon/walls/textures/r.png');
-	var dungeonTextureG = new Image(); setImageUrl(dungeonTextureG, '/img/frames/dungeon/walls/textures/g.png');
-	var dungeonTextureC = new Image(); setImageUrl(dungeonTextureC, '/img/frames/dungeon/walls/textures/c.png');
+	var dungeonFXtop = new Image(); setImageUrl(dungeonFXtop, 'img/frames/dungeon/walls/fx/top.png');
+	var dungeonFXleft = new Image(); setImageUrl(dungeonFXleft, 'img/frames/dungeon/walls/fx/left.png');
+	var dungeonFXbottom = new Image(); setImageUrl(dungeonFXbottom, 'img/frames/dungeon/walls/fx/bottom.png');
+	var dungeonFXright = new Image(); setImageUrl(dungeonFXright, 'img/frames/dungeon/walls/fx/right.png');
+	var dungeonFXtopright = new Image(); setImageUrl(dungeonFXtopright, 'img/frames/dungeon/walls/fx/topright.png');
+	var dungeonFXtopleft = new Image(); setImageUrl(dungeonFXtopleft, 'img/frames/dungeon/walls/fx/topleft.png');
+	var dungeonFXbottomright = new Image(); setImageUrl(dungeonFXbottomright, 'img/frames/dungeon/walls/fx/bottomright.png');
+	var dungeonFXbottomleft = new Image(); setImageUrl(dungeonFXbottomleft, 'img/frames/dungeon/walls/fx/bottomleft.png');
+	var dungeonShapetop = new Image(); setImageUrl(dungeonShapetop, 'img/frames/dungeon/walls/shape/top.png');
+	var dungeonShapeleft = new Image(); setImageUrl(dungeonShapeleft, 'img/frames/dungeon/walls/shape/left.png');
+	var dungeonShapebottom = new Image(); setImageUrl(dungeonShapebottom, 'img/frames/dungeon/walls/shape/bottom.png');
+	var dungeonShaperight = new Image(); setImageUrl(dungeonShaperight, 'img/frames/dungeon/walls/shape/right.png');
+	var dungeonShapetopright = new Image(); setImageUrl(dungeonShapetopright, 'img/frames/dungeon/walls/shape/topright.png');
+	var dungeonShapetopleft = new Image(); setImageUrl(dungeonShapetopleft, 'img/frames/dungeon/walls/shape/topleft.png');
+	var dungeonShapebottomright = new Image(); setImageUrl(dungeonShapebottomright, 'img/frames/dungeon/walls/shape/bottomright.png');
+	var dungeonShapebottomleft = new Image(); setImageUrl(dungeonShapebottomleft, 'img/frames/dungeon/walls/shape/bottomleft.png');
+	var dungeonDoorwayShape = new Image(); setImageUrl(dungeonDoorwayShape, 'img/frames/dungeon/walls/shape/doorway.png');
+	var dungeonDoorwayFX = new Image(); setImageUrl(dungeonDoorwayFX, 'img/frames/dungeon/walls/fx/doorway.png');
+	var dungeonDoorwayArrow = new Image(); setImageUrl(dungeonDoorwayArrow, 'img/frames/dungeon/walls/arrow.png');
+	var dungeonDoorwayCutout = new Image(); setImageUrl(dungeonDoorwayCutout, 'img/frames/dungeon/walls/doorway.png');
+	var dungeonOuterShape = new Image(); setImageUrl(dungeonOuterShape, 'img/frames/dungeon/walls/shape/outer.png');
+	var dungeonOuterFX = new Image(); setImageUrl(dungeonOuterFX, 'img/frames/dungeon/walls/fx/outer.png');
+	var dungeonTextureW = new Image(); setImageUrl(dungeonTextureW, 'img/frames/dungeon/walls/textures/w.png');
+	var dungeonTextureU = new Image(); setImageUrl(dungeonTextureU, 'img/frames/dungeon/walls/textures/u.png');
+	var dungeonTextureB = new Image(); setImageUrl(dungeonTextureB, 'img/frames/dungeon/walls/textures/b.png');
+	var dungeonTextureR = new Image(); setImageUrl(dungeonTextureR, 'img/frames/dungeon/walls/textures/r.png');
+	var dungeonTextureG = new Image(); setImageUrl(dungeonTextureG, 'img/frames/dungeon/walls/textures/g.png');
+	var dungeonTextureC = new Image(); setImageUrl(dungeonTextureC, 'img/frames/dungeon/walls/textures/c.png');
 	dungeonTextureC.onload = dungeonEditedBuffer;
 }
 
@@ -127,24 +127,24 @@ function dungeonEdited() {
 			// right walls
 			dungeonContext.drawImage(dungeonShaperight, origX + cellSize * (room[0] + room[2]), origY + cellSize * (room[1] + i), cellSize, cellSize);
 			dungeonFXContext.drawImage(dungeonFXright, origX + cellSize * (room[0] + room[2]), origY + cellSize * (room[1] + i), cellSize, cellSize);
-		} 
+		}
 	});
 	dungeonContext.drawImage(dungeonOuterShape, 0, 0, dungeonCanvas.width, dungeonCanvas.height);
 	dungeonFXContext.drawImage(dungeonOuterFX, 0, 0, dungeonFXCanvas.width, dungeonFXCanvas.height);
 	// text
 	var textObjects = {};
-	textObjects.title = {name:'Title', text:'', x:0.0854, y:0.0522, width:0.8292, height:0.0543, oneLine:true, font:'belerenbsc', size:0.0381, color:'white', align:'center'};
+	textObjects.title = { name: 'Title', text: '', x: 0.0854, y: 0.0522, width: 0.8292, height: 0.0543, oneLine: true, font: 'belerenbsc', size: 0.0381, color: 'white', align: 'center' };
 	roomNumber = 1;
 	rooms.forEach(room => {
-		var textbox = {name:`Dungeon Room ${roomNumber}`, text:`Room ${roomNumber}{lns}{fontmplantin}{fontsize-8}Effect.`, x:(origX + cellSize * (room[0] + 0.5)) / card.width, y:(origY + cellSize * (room[1] + 0.5)) / card.height, width:(cellSize * room[2]) / card.width, height:(cellSize * room[3]) / card.height, font:'belerenb', size:0.0324, align:'center'};
+		var textbox = { name: `Dungeon Room ${roomNumber}`, text: `Room ${roomNumber}{lns}{fontmplantin}{fontsize-8}Effect.`, x: (origX + cellSize * (room[0] + 0.5)) / card.width, y: (origY + cellSize * (room[1] + 0.5)) / card.height, width: (cellSize * room[2]) / card.width, height: (cellSize * room[3]) / card.height, font: 'belerenb', size: 0.0324, align: 'center' };
 		if (room[3] < 3) {
 			textbox.text = textbox.text.replace('{lns}', '   ');
 		}
 		textObjects[`dungeonRoom${roomNumber}`] = textbox;
-		roomNumber ++;
+		roomNumber++;
 	})
 	// doorways
-	rooms.push([0,-2,16,1,7]);
+	rooms.push([0, -2, 16, 1, 7]);
 	rooms.forEach(room => {
 		doorways = room.slice(4);
 		doorways.forEach(doorway => {

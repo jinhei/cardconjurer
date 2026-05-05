@@ -10,7 +10,7 @@ if (localStorage.getItem('cardKeyList') == null) {
 function loadSavedCards() {
   localStorageCardKeyList = JSON.parse(localStorage.getItem('cardKeyList'))
   document.getElementById('inputCardToImport').innerHTML = '<option disabled selected="selected">None selected</option>'
-  for (var i = 0; i < localStorageCardKeyList.length; i ++) {
+  for (var i = 0; i < localStorageCardKeyList.length; i++) {
     document.getElementById('inputCardToImport').innerHTML += '<option>' + localStorageCardKeyList[i] + '</option>'
   }
 }
@@ -27,7 +27,7 @@ function saveCard() {
       var duplicateCount = 1
       while (localStorageCardKeyList.includes(savedCardKey)) {
         savedCardKey = originalCardKey + ' (' + duplicateCount + ')'
-        duplicateCount ++
+        duplicateCount++
       }
     }
   }
@@ -36,7 +36,7 @@ function saveCard() {
     localStorageCardKeyList.push(savedCardKey)
     localStorageCardKeyList.sort()
     document.getElementById('inputCardToImport').innerHTML = '<option disabled selected="selected">None selected</option>'
-    for (var i = 0; i < localStorageCardKeyList.length; i ++) {
+    for (var i = 0; i < localStorageCardKeyList.length; i++) {
       document.getElementById('inputCardToImport').innerHTML += '<option>' + localStorageCardKeyList[i] + '</option>'
     }
     localStorage.setItem('cardKeyList', JSON.stringify(localStorageCardKeyList))
@@ -49,7 +49,7 @@ function deleteCard() {
   if (confirm('Are you sure you want to delete ' + selectedCardKey + '?')) {
     localStorageCardKeyList.splice(localStorageCardKeyList.indexOf(selectedCardKey), 1)
     document.getElementById('inputCardToImport').innerHTML = '<option disabled selected="selected">None selected</option>'
-    for (var i = 0; i < localStorageCardKeyList.length; i ++) {
+    for (var i = 0; i < localStorageCardKeyList.length; i++) {
       document.getElementById('inputCardToImport').innerHTML += '<option>' + localStorageCardKeyList[i] + '</option>'
     }
     localStorage.setItem('cardKeyList', JSON.stringify(localStorageCardKeyList))
@@ -78,7 +78,7 @@ function importSavedCard(localStorageKey = document.getElementById('inputCardToI
     document.getElementById('inputFrameVersion').value = importedCard.version.split('/')[0]
     loadVersion(importedCard.version.split('/')[0])
     if (!importedCard.version.includes('version')) {
-      loadScript('/data/scripts/versions/' + importedCard.version + '.js')
+      loadScript('data/scripts/versions/' + importedCard.version + '.js')
     }
     //Frame
     document.getElementById('cardMaster').innerHTML = importedCard.cardMaster
@@ -86,12 +86,12 @@ function importSavedCard(localStorageKey = document.getElementById('inputCardToI
     cardMasterList = cardMasterList.concat(importedCard.cardMasterList)
     var tempObject = new cardImage()
     var tempElement = tempObject.cardMasterElement()
-    for (var i = 2; i < cardMasterList.length; i ++) {
+    for (var i = 2; i < cardMasterList.length; i++) {
       cardMasterList[i].image = new Image()
       cardMasterList[i].image.src = cardMasterList[i].imageSource
       cardMasterList[i].draw = tempObject.draw
     }
-    for (var i = 0; i < document.getElementById('cardMaster').children.length; i ++) {
+    for (var i = 0; i < document.getElementById('cardMaster').children.length; i++) {
       if (parseInt(document.getElementById('cardMaster').children[i].id.replace('uniqueNumber', '')) > 1) {
         document.getElementById('cardMaster').children[i].onclick = tempElement.onclick
       }
@@ -122,7 +122,7 @@ function importSavedCard(localStorageKey = document.getElementById('inputCardToI
     bottomInfoUpdated()
     //Mana Cost
     if (importedCard.manaCostList) {
-      for (var i = 0; i < importedCard.manaCostList.length; i ++) {
+      for (var i = 0; i < importedCard.manaCostList.length; i++) {
         if (!manaSymbolCodeList.includes(importedCard.manaCostList[i][0])) {
           manaSymbolCodeList.push(importedCard.manaCostList[i][0])
           manaSymbolImageList.push(new Image())
@@ -144,7 +144,7 @@ class savedCard {
   constructor(keyToUse = 'unnamed') {
     //Masks
     this.maskList = []
-    for (var i = 0; i < cardMasterList.length; i ++) {
+    for (var i = 0; i < cardMasterList.length; i++) {
       if (cardMasterList[i].masks != undefined) {
         this.maskList.push([cardMasterList[i].masks[0], maskImageList[maskNameList.indexOf(cardMasterList[i].masks[0])].src])
       }
@@ -178,7 +178,7 @@ class savedCard {
     this.artist = document.getElementById('inputInfoArtist').value
     //Mana Cost
     this.manaCostList = []
-    for (var i = 0; i < usedManaSymbols.length; i ++) {
+    for (var i = 0; i < usedManaSymbols.length; i++) {
       this.manaCostList.push([usedManaSymbols[i], manaSymbolImageList[manaSymbolCodeList.indexOf(usedManaSymbols[i])].src])
     }
     this.manaCost = document.getElementById('inputManaCost').value
@@ -196,11 +196,11 @@ class savedCard {
 
 function downloadSavedCards() {
   var savedCardsText = ''
-  for (var i = 0; i < localStorageCardKeyList.length; i ++) {
+  for (var i = 0; i < localStorageCardKeyList.length; i++) {
     savedCardsText += localStorageCardKeyList[i] + '<<cardData>>' + localStorage.getItem(localStorageCardKeyList[i]) + '<<newCard>>'
   }
   savedCardsText = savedCardsText.slice(0, -11)
-  var blob = new Blob([savedCardsText], {type: 'text'})
+  var blob = new Blob([savedCardsText], { type: 'text' })
   var a = document.createElement('a')
   a.download = 'Card_Conjurer_Saved_Cards'
   a.href = URL.createObjectURL(blob)
@@ -209,14 +209,14 @@ function downloadSavedCards() {
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
-  setTimeout(function() { URL.revokeObjectURL(a.href); }, 1500)
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500)
 }
 
 function uploadSavedCards(event) {
   var reader = new FileReader()
-  reader.onload = function() {
+  reader.onload = function () {
     var uploadedCardList = reader.result.split('<<newCard>>')
-    for (var j = 0; j < uploadedCardList.length; j ++) {
+    for (var j = 0; j < uploadedCardList.length; j++) {
       var uploadedCard = uploadedCardList[j].split('<<cardData>>')
       var savedCardKey = uploadedCard[0]
       if (localStorageCardKeyList.includes(savedCardKey)) {
@@ -225,7 +225,7 @@ function uploadSavedCards(event) {
           var duplicateCount = 1
           while (localStorageCardKeyList.includes(savedCardKey)) {
             savedCardKey = originalCardKey + ' (' + duplicateCount + ')'
-            duplicateCount ++
+            duplicateCount++
           }
         }
       }
@@ -237,7 +237,7 @@ function uploadSavedCards(event) {
     }
     localStorageCardKeyList.sort()
     document.getElementById('inputCardToImport').innerHTML = '<option disabled selected="selected">None selected</option>'
-    for (var i = 0; i < localStorageCardKeyList.length; i ++) {
+    for (var i = 0; i < localStorageCardKeyList.length; i++) {
       document.getElementById('inputCardToImport').innerHTML += '<option>' + localStorageCardKeyList[i] + '</option>'
     }
     localStorage.setItem('cardKeyList', JSON.stringify(localStorageCardKeyList))

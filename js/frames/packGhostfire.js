@@ -1,14 +1,15 @@
 //Create objects for common properties across available frames
-// var masks = [{src:'/img/frames/m15/regular/m15MaskPinline.png', name:'Pinline'}, {src:'/img/frames/m15/regular/m15MaskTitle.png', name:'Title'}, {src:'/img/frames/m15/regular/m15MaskType.png', name:'Type'}, {src:'/img/frames/m15/regular/m15MaskRules.png', name:'Rules'}, {src:'/img/frames/m15/regular/m15MaskFrame.png', name:'Frame'}, {src:'/img/frames/m15/regular/m15MaskBorder.png', name:'Border'}];
+// var masks = [{src:'img/frames/m15/regular/m15MaskPinline.png', name:'Pinline'}, {src:'img/frames/m15/regular/m15MaskTitle.png', name:'Title'}, {src:'img/frames/m15/regular/m15MaskType.png', name:'Type'}, {src:'img/frames/m15/regular/m15MaskRules.png', name:'Rules'}, {src:'img/frames/m15/regular/m15MaskFrame.png', name:'Frame'}, {src:'img/frames/m15/regular/m15MaskBorder.png', name:'Border'}];
 //defines available frames
 
 availableFrames = [
-    {   name: "Frame", 
+    {
+        name: "Frame",
         src: "img/frames/ghostfire/frame.png",
     },
     {
         name: "Power/Toughness",
-        src: "img/frames/ghostfire/pt.png", bounds:{ y: -0.003, x: -0.001 },
+        src: "img/frames/ghostfire/pt.png", bounds: { y: -0.003, x: -0.001 },
     },
     {
         name: "BorderlessFrame",

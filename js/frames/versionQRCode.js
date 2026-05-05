@@ -1,16 +1,16 @@
 //checks to see if it needs to run
-if (!loadedVersions.includes('/js/frames/versionQRCode.js')) {
-	loadedVersions.push('/js/frames/versionQRCode.js');
+if (!loadedVersions.includes('js/frames/versionQRCode.js')) {
+	loadedVersions.push('js/frames/versionQRCode.js');
 	card.qrCode = {
-		x:0.36,
-		y:0.73,
-		size:0.20,
-		fgColor:'#fff',
-		fgAlpha:1,
-		bgColor:'#000',
-		bgAlpha:0,
-		padding:0,
-		url:'https://cardconjurer.com/'
+		x: 0.36,
+		y: 0.73,
+		size: 0.20,
+		fgColor: '#fff',
+		fgAlpha: 1,
+		bgColor: '#000',
+		bgAlpha: 0,
+		padding: 0,
+		url: 'https://cardconjurer.com/'
 	}
 	sizeCanvas('qrious');
 	sizeCanvas('qrCode');
@@ -38,7 +38,7 @@ if (!loadedVersions.includes('/js/frames/versionQRCode.js')) {
 	</div>-->
 	`;
 	document.querySelector('#creator-menu-sections').appendChild(newHTML);
-	loadScript('/js/qrious.min.js');
+	loadScript('js/qrious.min.js');
 }
 
 function updateQRCode(url = card.qrCode.url) {

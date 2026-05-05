@@ -13,7 +13,7 @@ function fixUri(input) {
 	if (input.includes(prefix) || input.includes('http') || input.includes('data:image') || window.location.href.includes('localhost')) {
 		return input;
 	} else {
-		return prefix + input; //input.replace('/img/frames', prefix + '/img/frames');
+		return prefix + input; //input.replace('img/frames', prefix + 'img/frames');
 	} */
 	return input;
 }
@@ -48,128 +48,128 @@ function getStandardHeight() {
 
 // Trackers for bulk download
 window.ImageLoadTracker = {
-    promises: [],
-    isTracking: false,
+	promises: [],
+	isTracking: false,
 
-    // Call this to start a new tracking session.
-    start: function() {
-        this.promises = [];
-        this.isTracking = true;
-    },
+	// Call this to start a new tracking session.
+	start: function () {
+		this.promises = [];
+		this.isTracking = true;
+	},
 
-    // Call this to end the session.
-    stop: function() {
-        this.isTracking = false;
-        this.promises = [];
-    },
+	// Call this to end the session.
+	stop: function () {
+		this.isTracking = false;
+		this.promises = [];
+	},
 
-    /**
-     * Creates a promise that resolves when the image from 'src' is loaded.
-     * Adds this promise to the tracking array.
-     * @param {string} src - The source URL of the image to load.
-     */
-    track: function(src) {
-        // Only track if a session is active and the src is valid.
-        if (!this.isTracking || !src || src.includes('blank.png')) {
-            return;
-        }
+	/**
+	 * Creates a promise that resolves when the image from 'src' is loaded.
+	 * Adds this promise to the tracking array.
+	 * @param {string} src - The source URL of the image to load.
+	 */
+	track: function (src) {
+		// Only track if a session is active and the src is valid.
+		if (!this.isTracking || !src || src.includes('blank.png')) {
+			return;
+		}
 
-        const promise = new Promise((resolve) => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            // Resolve the promise on load.
-            img.onload = () => resolve(img);
-            // Also resolve on error to prevent Promise.all from failing on a single broken image.
-            // The app's own error handlers will manage displaying a blank image.
-            img.onerror = () => {
-                console.warn(`Could not load tracked image: ${src}`);
-                resolve(null); 
-            };
-            img.src = src;
-        });
-        this.promises.push(promise);
-    },
+		const promise = new Promise((resolve) => {
+			const img = new Image();
+			img.crossOrigin = 'anonymous';
+			// Resolve the promise on load.
+			img.onload = () => resolve(img);
+			// Also resolve on error to prevent Promise.all from failing on a single broken image.
+			// The app's own error handlers will manage displaying a blank image.
+			img.onerror = () => {
+				console.warn(`Could not load tracked image: ${src}`);
+				resolve(null);
+			};
+			img.src = src;
+		});
+		this.promises.push(promise);
+	},
 
-    /**
-     * Returns a single promise that resolves when all tracked images have finished loading.
-     */
-    waitForAll: function() {
-        return Promise.all(this.promises);
-    }
+	/**
+	 * Returns a single promise that resolves when all tracked images have finished loading.
+	 */
+	waitForAll: function () {
+		return Promise.all(this.promises);
+	}
 };
 window.FontLoadTracker = {
-    fonts: new Set(),
-    isTracking: false,
+	fonts: new Set(),
+	isTracking: false,
 
-    // Call this to start a new font tracking session.
-    start: function() {
-        this.fonts.clear();
-        this.isTracking = true;
-    },
+	// Call this to start a new font tracking session.
+	start: function () {
+		this.fonts.clear();
+		this.isTracking = true;
+	},
 
-    // Call this to end the session.
-    stop: function() {
-        this.isTracking = false;
-        this.fonts.clear();
-    },
+	// Call this to end the session.
+	stop: function () {
+		this.isTracking = false;
+		this.fonts.clear();
+	},
 
-    /**
-     * Adds a font family to the set of required fonts for the current card.
-     * @param {string} fontFamily - The name of the font family to track (e.g., 'belerenbsc').
-     */
-    track: function(fontFamily) {
-        if (this.isTracking && fontFamily) {
-            this.fonts.add(fontFamily);
-        }
-    },
+	/**
+	 * Adds a font family to the set of required fonts for the current card.
+	 * @param {string} fontFamily - The name of the font family to track (e.g., 'belerenbsc').
+	 */
+	track: function (fontFamily) {
+		if (this.isTracking && fontFamily) {
+			this.fonts.add(fontFamily);
+		}
+	},
 
-    /**
-     * Uses the document.fonts API to wait for all tracked fonts to be loaded and ready.
-     * @returns {Promise} A promise that resolves when all fonts in the set are available.
-     */
-    waitForAll: function() {
-        if (this.fonts.size === 0) {
-            return Promise.resolve(); // No fonts to wait for.
-        }
+	/**
+	 * Uses the document.fonts API to wait for all tracked fonts to be loaded and ready.
+	 * @returns {Promise} A promise that resolves when all fonts in the set are available.
+	 */
+	waitForAll: function () {
+		if (this.fonts.size === 0) {
+			return Promise.resolve(); // No fonts to wait for.
+		}
 
-        const fontPromises = [];
-        // The document.fonts.load() method checks if a font is ready for use.
-        // It requires a size (e.g., '12px'), but the family name is the crucial part.
-        for (const font of this.fonts) {
-            fontPromises.push(document.fonts.load(`12px ${font}`));
-        }
+		const fontPromises = [];
+		// The document.fonts.load() method checks if a font is ready for use.
+		// It requires a size (e.g., '12px'), but the family name is the crucial part.
+		for (const font of this.fonts) {
+			fontPromises.push(document.fonts.load(`12px ${font}`));
+		}
 
-        console.log('Waiting for fonts to load:', Array.from(this.fonts));
-        return Promise.all(fontPromises);
-    }
+		console.log('Waiting for fonts to load:', Array.from(this.fonts));
+		return Promise.all(fontPromises);
+	}
 };
 
 //card object
-var card = {width:getStandardWidth(), height:getStandardHeight(), marginX:0, marginY:0, frames:[], artSource:fixUri('/img/blank.png'), artX:0, artY:0, artZoom:1, artRotate:0, setSymbolSource:fixUri('/img/blank.png'), setSymbolX:0, setSymbolY:0, setSymbolZoom:1, watermarkSource:fixUri('/img/blank.png'), watermarkX:0, watermarkY:0, watermarkZoom:1, watermarkLeft:'none', watermarkRight:'none', watermarkOpacity:0.4, version:'', manaSymbols:[]};
+var card = { width: getStandardWidth(), height: getStandardHeight(), marginX: 0, marginY: 0, frames: [], artSource: fixUri('img/blank.png'), artX: 0, artY: 0, artZoom: 1, artRotate: 0, setSymbolSource: fixUri('img/blank.png'), setSymbolX: 0, setSymbolY: 0, setSymbolZoom: 1, watermarkSource: fixUri('img/blank.png'), watermarkX: 0, watermarkY: 0, watermarkZoom: 1, watermarkLeft: 'none', watermarkRight: 'none', watermarkOpacity: 0.4, version: '', manaSymbols: [] };
 window.cardDrawingPromiseResolver = null;
 //core images/masks
-const black = new Image(); black.crossOrigin = 'anonymous'; black.src = fixUri('/img/black.png');
-const blank = new Image(); blank.crossOrigin = 'anonymous'; blank.src = fixUri('/img/blank.png');
-const right = new Image(); right.crossOrigin = 'anonymous'; right.src = fixUri('/img/frames/maskRightHalf.png');
-const middle = new Image(); middle.crossOrigin = 'anonymous'; middle.src = fixUri('/img/frames/maskMiddleThird.png');
-const corner = new Image(); corner.crossOrigin = 'anonymous'; corner.src = fixUri('/img/frames/cornerCutout.png');
-const serial = new Image(); serial.crossOrigin = 'anonymous'; serial.src = fixUri('/img/frames/serial.png');
+const black = new Image(); black.crossOrigin = 'anonymous'; black.src = fixUri('img/black.png');
+const blank = new Image(); blank.crossOrigin = 'anonymous'; blank.src = fixUri('img/blank.png');
+const right = new Image(); right.crossOrigin = 'anonymous'; right.src = fixUri('img/frames/maskRightHalf.png');
+const middle = new Image(); middle.crossOrigin = 'anonymous'; middle.src = fixUri('img/frames/maskMiddleThird.png');
+const corner = new Image(); corner.crossOrigin = 'anonymous'; corner.src = fixUri('img/frames/cornerCutout.png');
+const serial = new Image(); serial.crossOrigin = 'anonymous'; serial.src = fixUri('img/frames/serial.png');
 //art
 art = new Image(); art.crossOrigin = 'anonymous'; art.src = blank.src;
-art.onerror = function() {if (!this.src.includes('/img/blank.png')) {this.src = fixUri('/img/blank.png');}}
+art.onerror = function () { if (!this.src.includes('img/blank.png')) { this.src = fixUri('img/blank.png'); } }
 art.onload = artEdited;
 //set symbol
 setSymbol = new Image(); setSymbol.crossOrigin = 'anonymous'; setSymbol.src = blank.src;
-setSymbol.onerror = function() {
+setSymbol.onerror = function () {
 	if (this.src.includes('gatherer.wizards.com')) {
 		notify('<a target="_blank" href="http' + this.src.split('http')[2] + '">Loading the set symbol from Gatherer failed. Please check this link to see if it exists. If it does, it may be necessary to manually download and upload the image.</a>', 5);
 	}
-	if (!this.src.includes('/img/blank.png')) {this.src = fixUri('/img/blank.png');}
+	if (!this.src.includes('img/blank.png')) { this.src = fixUri('img/blank.png'); }
 }
 setSymbol.onload = setSymbolEdited;
 //watermark
 watermark = new Image(); watermark.crossOrigin = 'anonymous'; watermark.src = blank.src;
-watermark.onerror = function() {if (!this.src.includes('/img/blank.png')) {this.src = fixUri('/img/blank.png');}}
+watermark.onerror = function () { if (!this.src.includes('img/blank.png')) { this.src = fixUri('img/blank.png'); } }
 watermark.onload = watermarkEdited;
 //preview canvas
 var previewCanvas = document.querySelector('#previewCanvas');
@@ -204,10 +204,10 @@ document.querySelector("#info-year").value = card.infoYear;
 
 var loadedVersions = [];
 //Card Object managament
-async function resetCardIrregularities({canvas = [getStandardWidth(), getStandardHeight(), 0, 0], resetOthers = true} = {}) {
+async function resetCardIrregularities({ canvas = [getStandardWidth(), getStandardHeight(), 0, 0], resetOthers = true } = {}) {
 	//misc details
 	card.margins = false;
-	card.bottomInfoTranslate = {x:0, y:0};
+	card.bottomInfoTranslate = { x: 0, y: 0 };
 	card.bottomInfoRotate = 0;
 	card.bottomInfoZoom = 1;
 	card.bottomInfoColor = 'white';
@@ -242,25 +242,25 @@ async function resetCardIrregularities({canvas = [getStandardWidth(), getStandar
 }
 async function setBottomInfoStyle() {
 	if (document.querySelector('#enableNewCollectorStyle').checked) {
-			await loadBottomInfo({
-				midLeft: {text:'{elemidinfo-set} \u2022 {elemidinfo-language}  {savex}{fontbelerenbsc}{fontsize' + scaleHeight(0.001) + '}{upinline' + scaleHeight(0.0005) + '}\uFFEE{savex2}{elemidinfo-artist}', x:0.0647, y:0.9548, width:0.8707, height:0.0171, oneLine:true, font:'gothammedium', size:0.0171, color:card.bottomInfoColor, outlineWidth:0.003},
-				topLeft: {text:'{elemidinfo-rarity} {kerning3}{elemidinfo-number}{kerning0}', x:0.0647, y:0.9377, width:0.8707, height:0.0171, oneLine:true, font:'gothammedium', size:0.0171, color:card.bottomInfoColor, outlineWidth:0.003},
-				note: {text:'{loadx}{elemidinfo-note}', x:0.0647, y:0.9377, width:0.8707, height:0.0171, oneLine:true, font:'gothammedium', size:0.0171, color:card.bottomInfoColor, outlineWidth:0.003},
-				bottomLeft: {text:'NOT FOR SALE', x:0.0647, y:0.9719, width:0.8707, height:0.0143, oneLine:true, font:'gothammedium', size:0.0143, color:card.bottomInfoColor, outlineWidth:0.003},
-				wizards: {name:'wizards', text:'{ptshift0,0.0172}\u2122 & \u00a9 {elemidinfo-year} Wizards of the Coast', x:0.0647, y:0.9377, width:0.8707, height:0.0167, oneLine:true, font:'mplantin', size:0.0162, color:card.bottomInfoColor, align:'right', outlineWidth:0.003},
-				bottomRight: {text:'{ptshift0,0.0172}CardConjurer.com', x:0.0647, y:0.9548, width:0.8707, height:0.0143, oneLine:true, font:'mplantin', size:0.0143, color:card.bottomInfoColor, align:'right', outlineWidth:0.003}
-			});
-		} else {
-			await loadBottomInfo({
-				midLeft: {text:'{elemidinfo-set} \u2022 {elemidinfo-language}  {savex}{fontbelerenbsc}{fontsize' + scaleHeight(0.001) + '}{upinline' + scaleHeight(0.0005) + '}\uFFEE{savex2}{elemidinfo-artist}', x:0.0647, y:0.9548, width:0.8707, height:0.0171, oneLine:true, font:'gothammedium', size:0.0171, color: card.bottomInfoColor, outlineWidth:0.003},
-				topLeft: {text:'{elemidinfo-number}', x:0.0647, y:0.9377, width:0.8707, height:0.0171, oneLine:true, font:'gothammedium', size:0.0171, color:card.bottomInfoColor, outlineWidth:0.003},
-				note: {text:'{loadx2}{elemidinfo-note}', x:0.0647, y:0.9377, width:0.8707, height:0.0171, oneLine:true, font:'gothammedium', size:0.0171, color:card.bottomInfoColor, outlineWidth:0.003},
-				rarity: {text:'{loadx}{elemidinfo-rarity}', x:0.0647, y:0.9377, width:0.8707, height:0.0171, oneLine:true, font:'gothammedium', size:0.0171, color:card.bottomInfoColor, outlineWidth:0.003},
-				bottomLeft: {text:'NOT FOR SALE', x:0.0647, y:0.9719, width:0.8707, height:0.0143, oneLine:true, font:'gothammedium', size:0.0143, color:card.bottomInfoColor, outlineWidth:0.003},
-				wizards: {name:'wizards', text:'{ptshift0,0.0172}\u2122 & \u00a9 {elemidinfo-year} Wizards of the Coast', x:0.0647, y:0.9377, width:0.8707, height:0.0167, oneLine:true, font:'mplantin', size:0.0162, color:card.bottomInfoColor, align:'right', outlineWidth:0.003},
-				bottomRight: {text:'{ptshift0,0.0172}CardConjurer.com', x:0.0647, y:0.9548, width:0.8707, height:0.0143, oneLine:true, font:'mplantin', size:0.0143, color:card.bottomInfoColor, align:'right', outlineWidth:0.003}
-			});
-		}
+		await loadBottomInfo({
+			midLeft: { text: '{elemidinfo-set} \u2022 {elemidinfo-language}  {savex}{fontbelerenbsc}{fontsize' + scaleHeight(0.001) + '}{upinline' + scaleHeight(0.0005) + '}\uFFEE{savex2}{elemidinfo-artist}', x: 0.0647, y: 0.9548, width: 0.8707, height: 0.0171, oneLine: true, font: 'gothammedium', size: 0.0171, color: card.bottomInfoColor, outlineWidth: 0.003 },
+			topLeft: { text: '{elemidinfo-rarity} {kerning3}{elemidinfo-number}{kerning0}', x: 0.0647, y: 0.9377, width: 0.8707, height: 0.0171, oneLine: true, font: 'gothammedium', size: 0.0171, color: card.bottomInfoColor, outlineWidth: 0.003 },
+			note: { text: '{loadx}{elemidinfo-note}', x: 0.0647, y: 0.9377, width: 0.8707, height: 0.0171, oneLine: true, font: 'gothammedium', size: 0.0171, color: card.bottomInfoColor, outlineWidth: 0.003 },
+			bottomLeft: { text: 'NOT FOR SALE', x: 0.0647, y: 0.9719, width: 0.8707, height: 0.0143, oneLine: true, font: 'gothammedium', size: 0.0143, color: card.bottomInfoColor, outlineWidth: 0.003 },
+			wizards: { name: 'wizards', text: '{ptshift0,0.0172}\u2122 & \u00a9 {elemidinfo-year} Wizards of the Coast', x: 0.0647, y: 0.9377, width: 0.8707, height: 0.0167, oneLine: true, font: 'mplantin', size: 0.0162, color: card.bottomInfoColor, align: 'right', outlineWidth: 0.003 },
+			bottomRight: { text: '{ptshift0,0.0172}CardConjurer.com', x: 0.0647, y: 0.9548, width: 0.8707, height: 0.0143, oneLine: true, font: 'mplantin', size: 0.0143, color: card.bottomInfoColor, align: 'right', outlineWidth: 0.003 }
+		});
+	} else {
+		await loadBottomInfo({
+			midLeft: { text: '{elemidinfo-set} \u2022 {elemidinfo-language}  {savex}{fontbelerenbsc}{fontsize' + scaleHeight(0.001) + '}{upinline' + scaleHeight(0.0005) + '}\uFFEE{savex2}{elemidinfo-artist}', x: 0.0647, y: 0.9548, width: 0.8707, height: 0.0171, oneLine: true, font: 'gothammedium', size: 0.0171, color: card.bottomInfoColor, outlineWidth: 0.003 },
+			topLeft: { text: '{elemidinfo-number}', x: 0.0647, y: 0.9377, width: 0.8707, height: 0.0171, oneLine: true, font: 'gothammedium', size: 0.0171, color: card.bottomInfoColor, outlineWidth: 0.003 },
+			note: { text: '{loadx2}{elemidinfo-note}', x: 0.0647, y: 0.9377, width: 0.8707, height: 0.0171, oneLine: true, font: 'gothammedium', size: 0.0171, color: card.bottomInfoColor, outlineWidth: 0.003 },
+			rarity: { text: '{loadx}{elemidinfo-rarity}', x: 0.0647, y: 0.9377, width: 0.8707, height: 0.0171, oneLine: true, font: 'gothammedium', size: 0.0171, color: card.bottomInfoColor, outlineWidth: 0.003 },
+			bottomLeft: { text: 'NOT FOR SALE', x: 0.0647, y: 0.9719, width: 0.8707, height: 0.0143, oneLine: true, font: 'gothammedium', size: 0.0143, color: card.bottomInfoColor, outlineWidth: 0.003 },
+			wizards: { name: 'wizards', text: '{ptshift0,0.0172}\u2122 & \u00a9 {elemidinfo-year} Wizards of the Coast', x: 0.0647, y: 0.9377, width: 0.8707, height: 0.0167, oneLine: true, font: 'mplantin', size: 0.0162, color: card.bottomInfoColor, align: 'right', outlineWidth: 0.003 },
+			bottomRight: { text: '{ptshift0,0.0172}CardConjurer.com', x: 0.0647, y: 0.9548, width: 0.8707, height: 0.0143, oneLine: true, font: 'mplantin', size: 0.0143, color: card.bottomInfoColor, align: 'right', outlineWidth: 0.003 }
+		});
+	}
 }
 //Canvas management
 function sizeCanvas(name, width = Math.round(card.width * (1 + 2 * card.marginX)), height = Math.round(card.height * (1 + 2 * card.marginY))) {
@@ -360,7 +360,7 @@ function touchMove(event) {
 		}
 	})
 }
-function dragOver(event, drag=true) {
+function dragOver(event, drag = true) {
 	var eventTarget;
 	if (drag) {
 		eventTarget = event.target.closest('.draggable');
@@ -377,14 +377,14 @@ function dragOver(event, drag=true) {
 		Array.from(parentElement.children).forEach((element, index) => {
 			if (element == eventTarget) {
 				movingElementNewIndex = index;
-				if(movingElementPassed) {
+				if (movingElementPassed) {
 					elements.appendChild(element.cloneNode(true));
 					elements.appendChild(movingElement.cloneNode(true));
 				} else {
 					elements.appendChild(movingElement.cloneNode(true));
 					elements.appendChild(element.cloneNode(true));
 				}
-			} else if(element != movingElement) {
+			} else if (element != movingElement) {
 				elements.appendChild(element.cloneNode(true));
 			} else {
 				movingElementOldIndex = index;
@@ -421,11 +421,11 @@ const setSymbolAliases = new Map([
 const mana = new Map();
 // var manaSymbols = [];
 loadManaSymbols(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-				 'w', 'u', 'b', 'r', 'g', 'c', 'x', 'y', 'z', 't', 'untap', 's', 'oldtap', 'originaltap', 'purple', "inf", "alchemy"]);
+	'w', 'u', 'b', 'r', 'g', 'c', 'x', 'y', 'z', 't', 'untap', 's', 'oldtap', 'originaltap', 'purple', "inf", "alchemy"]);
 loadManaSymbols(true, ['e', 'a', 'p']);
 loadManaSymbols(['wu', 'wb', 'ub', 'ur', 'br', 'bg', 'rg', 'rw', 'gw', 'gu', '2w', '2u', '2b', '2r', '2g', 'wp', 'up', 'bp', 'rp', 'gp', 'h',
-				 'wup', 'wbp', 'ubp', 'urp', 'brp', 'bgp', 'rgp', 'rwp', 'gwp', 'gup', 'purplew', 'purpleu', 'purpleb', 'purpler', 'purpleg',
-				 '2purple', 'purplep', 'cw', 'cu', 'cb', 'cr', 'cg'], [1.2, 1.2]);
+	'wup', 'wbp', 'ubp', 'urp', 'brp', 'bgp', 'rgp', 'rwp', 'gwp', 'gup', 'purplew', 'purpleu', 'purpleb', 'purpler', 'purpleg',
+	'2purple', 'purplep', 'cw', 'cu', 'cb', 'cr', 'cg'], [1.2, 1.2]);
 loadManaSymbols(['bar.png', 'whitebar.png']);
 loadManaSymbols(['brush', 'whitebrush'], [2.85, 2.85]);
 loadManaSymbols(['xxbgw', 'xxbrg', 'xxgub', 'xxgwu', 'xxrgw', 'xxrwu', 'xxubr', 'xxurg', 'xxwbr', 'xxwub'], [1.2, 1.2]);
@@ -436,7 +436,7 @@ loadManaSymbols(true, ['+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '-1
 function loadManaSymbols(matchColor, manaSymbolPaths, size = [1, 1]) {
 	if (typeof matchColor === 'object') {
 		// Hacky way to add a default argument for matchColor without breaking the function call from other places
-		size = manaSymbolPaths || [1,1];
+		size = manaSymbolPaths || [1, 1];
 		manaSymbolPaths = matchColor;
 		matchColor = false;
 	}
@@ -457,7 +457,7 @@ function loadManaSymbols(matchColor, manaSymbolPaths, size = [1, 1]) {
 		if (typeof item != 'string') {
 			manaSymbol.back = item[1];
 			manaSymbol.backs = item[2];
-			for (var i = 0; i < item[2]; i ++) {
+			for (var i = 0; i < item[2]; i++) {
 				loadManaSymbols([manaSymbol.path.replace(manaSymbol.name, 'back' + i + item[1])])
 			}
 		}
@@ -468,7 +468,7 @@ function loadManaSymbols(matchColor, manaSymbolPaths, size = [1, 1]) {
 		manaSymbol.height = size[1];
 		manaSymbol.image = new Image();
 		manaSymbol.image.crossOrigin = 'anonymous';
-		var manaSymbolPath = '/img/manaSymbols/' + manaSymbol.path;
+		var manaSymbolPath = 'img/manaSymbols/' + manaSymbol.path;
 		if (!manaSymbolPath.includes('.png')) {
 			manaSymbolPath += '.svg';
 		}
@@ -525,7 +525,7 @@ function drawFrames() {
 				for (var i = 0; i < existingPixels.length; i += 4) {
 					const functionalAlpha = maskPixels[i + 3] * functionalAlphaMultiplier //functional alpha = alpha ignoring source image
 					if (newPixels[i + 3] > 0) { //Only blend if the new image has alpha
-						existingPixels[  i  ] = existingPixels[  i  ] * (1 - functionalAlpha) + newPixels[  i  ] * functionalAlpha; //RED
+						existingPixels[i] = existingPixels[i] * (1 - functionalAlpha) + newPixels[i] * functionalAlpha; //RED
 						existingPixels[i + 1] = existingPixels[i + 1] * (1 - functionalAlpha) + newPixels[i + 1] * functionalAlpha; //GREEN
 						existingPixels[i + 2] = existingPixels[i + 2] * (1 - functionalAlpha) + newPixels[i + 2] * functionalAlpha; //BLUE
 					}
@@ -535,13 +535,13 @@ function drawFrames() {
 				//mask the image
 				frameMaskingContext.drawImage(item.image, frameX, frameY, frameWidth, frameHeight);
 				//color overlay
-				if (item.colorOverlayCheck) {frameMaskingContext.globalCompositeOperation = 'source-in'; frameMaskingContext.fillStyle = item.colorOverlay; frameMaskingContext.fillRect(0, 0, frameMaskingCanvas.width, frameMaskingCanvas.height);}
+				if (item.colorOverlayCheck) { frameMaskingContext.globalCompositeOperation = 'source-in'; frameMaskingContext.fillStyle = item.colorOverlay; frameMaskingContext.fillRect(0, 0, frameMaskingCanvas.width, frameMaskingCanvas.height); }
 				//HSL adjustments
 				if (item.hslHue || item.hslSaturation || item.hslLightness) {
 					hsl(frameMaskingCanvas, item.hslHue || 0, item.hslSaturation || 0, item.hslLightness || 0);
 				}
 				//erase mode
-				if (item.erase) {frameContext.globalCompositeOperation = 'destination-out';}
+				if (item.erase) { frameContext.globalCompositeOperation = 'destination-out'; }
 				frameContext.drawImage(frameMaskingCanvas, 0, 0, frameCanvas.width, frameCanvas.height);
 			}
 		}
@@ -577,10 +577,10 @@ function loadFramePack(frameOptions = availableFrames) {
 		frameOption.onclick = frameOptionClicked;
 		var frameOptionImage = document.createElement('img');
 		frameOption.appendChild(frameOptionImage);
-		frameOptionImage.onload = function() {
+		frameOptionImage.onload = function () {
 			this.parentElement.classList.remove('hidden');
 		}
-		if (!item.noThumb && !item.src.includes('/img/black.png')) {
+		if (!item.noThumb && !item.src.includes('img/black.png')) {
 			frameOptionImage.src = fixUri(item.src.replace('.png', 'Thumb.png').replace('.svg', 'Thumb.png'));
 		} else {
 			frameOptionImage.src = fixUri(item.src);
@@ -619,7 +619,7 @@ function frameOptionClicked(event) {
 				maskOption.onclick = maskOptionClicked;
 				const maskOptionImage = document.createElement('img');
 				maskOption.appendChild(maskOptionImage);
-				maskOptionImage.onload = function() {
+				maskOptionImage.onload = function () {
 					this.parentElement.classList.remove('hidden');
 				}
 				maskOptionImage.src = fixUri(item.src.replace('.png', 'Thumb.png').replace('.svg', 'Thumb.png'));
@@ -643,7 +643,7 @@ function maskOptionClicked(event) {
 	if (newMaskIndex != selectedMaskIndex) { button = null; }
 	selectedMaskIndex = newMaskIndex;
 	var selectedMaskName = 'No Mask'
-	if (selectedMaskIndex > 0) {selectedMaskName = availableFrames[selectedFrameIndex].masks[selectedMaskIndex - 1].name;}
+	if (selectedMaskIndex > 0) { selectedMaskName = availableFrames[selectedFrameIndex].masks[selectedMaskIndex - 1].name; }
 	document.querySelector('#selectedPreview').innerHTML = '(Selected: ' + availableFrames[selectedFrameIndex].name + ', ' + selectedMaskName + ')';
 	if (button) { button.click(); resetDoubleClick(); }
 }
@@ -678,17 +678,17 @@ function doubleClick(event, maskOrFrame) {
 function cardFrameProperties(colors, manaCost, typeLine, power, style) {
 	var colors = colors.map(color => color.toUpperCase())
 	if ([
-			['U', 'W'],
-			['B', 'W'],
-			['R', 'B'],
-			['G', 'B'],
-			['B', 'U'],
-			['R', 'U'],
-			['G', 'R'],
-			['W', 'R'],
-			['W', 'G'],
-			['U', 'G']
-		].map(arr => JSON.stringify(arr) === JSON.stringify(colors)).includes(true)) {
+		['U', 'W'],
+		['B', 'W'],
+		['R', 'B'],
+		['G', 'B'],
+		['B', 'U'],
+		['R', 'U'],
+		['G', 'R'],
+		['W', 'R'],
+		['W', 'G'],
+		['U', 'G']
+	].map(arr => JSON.stringify(arr) === JSON.stringify(colors)).includes(true)) {
 		colors.reverse();
 	}
 
@@ -705,7 +705,7 @@ function cardFrameProperties(colors, manaCost, typeLine, power, style) {
 		} else {
 			if (colors.length == 1) {
 				rules = colors[0];
-			} else if (colors.length >=2) {
+			} else if (colors.length >= 2) {
 				rules = 'M';
 			} else if (typeLine.includes("Artifact")) {
 				rules = 'A';
@@ -872,12 +872,12 @@ async function addFrame(additionalMasks = [], loadingFrame = false) {
 	if (!loadingFrame) {
 		// The frame is being added manually by the user, so we must process which mask(s) they have selected
 		var noDefaultMask = 0;
-		if (frameToAdd.noDefaultMask) {noDefaultMask = 1;}
+		if (frameToAdd.noDefaultMask) { noDefaultMask = 1; }
 		if (frameToAdd.masks && selectedMaskIndex + noDefaultMask > 0) {
 			frameToAdd.masks = frameToAdd.masks.slice(selectedMaskIndex - 1 + noDefaultMask, selectedMaskIndex + noDefaultMask);
 		} else {
-		 	frameToAdd.masks = [];
-		 	maskThumbnail = false;
+			frameToAdd.masks = [];
+			maskThumbnail = false;
 		}
 		additionalMasks.forEach(item => {
 			if (item.name in replacementMasks) {
@@ -904,9 +904,9 @@ async function addFrame(additionalMasks = [], loadingFrame = false) {
 				frameToAdd.complementary = [frameToAdd.complementary];
 			} else if (typeof frameToAdd.complementary == 'string') {
 				availableFrames.forEach((availableFrame, index, availableFrames) => {
-				  if (availableFrame.name == frameToAdd.complementary) {
-				  	frameToAdd.complementary = [index];
-				  }
+					if (availableFrame.name == frameToAdd.complementary) {
+						frameToAdd.complementary = [index];
+					}
 				})
 			}
 			const realFrameIndex = selectedFrameIndex;
@@ -918,7 +918,7 @@ async function addFrame(additionalMasks = [], loadingFrame = false) {
 		}
 	} else {
 		frameToAdd = loadingFrame;
-		if (frameToAdd.masks.length == 0 || (frameToAdd.masks[0].src.includes('/img/frames/mask'))) {
+		if (frameToAdd.masks.length == 0 || (frameToAdd.masks[0].src.includes('img/frames/mask'))) {
 			maskThumbnail = false;
 		}
 	}
@@ -954,7 +954,7 @@ async function addFrame(additionalMasks = [], loadingFrame = false) {
 	frameElement.ontouchmove = touchMove;
 	frameElement.onclick = frameElementClicked;
 	var frameElementImage = document.createElement('img');
-	if (frameToAdd.noThumb || frameToAdd.src.includes('/img/black.png')) {
+	if (frameToAdd.noThumb || frameToAdd.src.includes('img/black.png')) {
 		frameElementImage.src = fixUri(frameToAdd.src);
 	} else {
 		frameElementImage.src = fixUri(frameToAdd.src.replace('.png', 'Thumb.png'));
@@ -996,35 +996,35 @@ function frameElementClicked(event) {
 		}
 		// Basic manipulations
 		document.querySelector('#frame-editor-x').value = scaleWidth(selectedFrame.bounds.x || 0);
-		document.querySelector('#frame-editor-x').onchange = (event) => {selectedFrame.bounds.x = (event.target.value / card.width); drawFrames();}
+		document.querySelector('#frame-editor-x').onchange = (event) => { selectedFrame.bounds.x = (event.target.value / card.width); drawFrames(); }
 		document.querySelector('#frame-editor-y').value = scaleHeight(selectedFrame.bounds.y || 0);
-		document.querySelector('#frame-editor-y').onchange = (event) => {selectedFrame.bounds.y = (event.target.value / card.height); drawFrames();}
+		document.querySelector('#frame-editor-y').onchange = (event) => { selectedFrame.bounds.y = (event.target.value / card.height); drawFrames(); }
 		document.querySelector('#frame-editor-width').value = scaleWidth(selectedFrame.bounds.width || 1);
-		document.querySelector('#frame-editor-width').onchange = (event) => {selectedFrame.bounds.width = (event.target.value / card.width); drawFrames();}
+		document.querySelector('#frame-editor-width').onchange = (event) => { selectedFrame.bounds.width = (event.target.value / card.width); drawFrames(); }
 		document.querySelector('#frame-editor-height').value = scaleHeight(selectedFrame.bounds.height || 1);
-		document.querySelector('#frame-editor-height').onchange = (event) => {selectedFrame.bounds.height = (event.target.value / card.height); drawFrames();}
+		document.querySelector('#frame-editor-height').onchange = (event) => { selectedFrame.bounds.height = (event.target.value / card.height); drawFrames(); }
 		document.querySelector('#frame-editor-opacity').value = selectedFrame.opacity || 100;
-		document.querySelector('#frame-editor-opacity').onchange = (event) => {selectedFrame.opacity = event.target.value; drawFrames();}
+		document.querySelector('#frame-editor-opacity').onchange = (event) => { selectedFrame.opacity = event.target.value; drawFrames(); }
 		document.querySelector('#frame-editor-erase').checked = selectedFrame.erase || false;
-		document.querySelector('#frame-editor-erase').onchange = (event) => {selectedFrame.erase = event.target.checked; drawFrames();}
+		document.querySelector('#frame-editor-erase').onchange = (event) => { selectedFrame.erase = event.target.checked; drawFrames(); }
 		document.querySelector('#frame-editor-alpha').checked = selectedFrame.preserveAlpha || false;
-		document.querySelector('#frame-editor-alpha').onchange = (event) => {selectedFrame.preserveAlpha = event.target.checked; drawFrames();}
+		document.querySelector('#frame-editor-alpha').onchange = (event) => { selectedFrame.preserveAlpha = event.target.checked; drawFrames(); }
 		document.querySelector('#frame-editor-color-overlay-check').checked = selectedFrame.colorOverlayCheck || false;
-		document.querySelector('#frame-editor-color-overlay-check').onchange = (event) => {selectedFrame.colorOverlayCheck = event.target.checked; drawFrames();}
+		document.querySelector('#frame-editor-color-overlay-check').onchange = (event) => { selectedFrame.colorOverlayCheck = event.target.checked; drawFrames(); }
 		document.querySelector('#frame-editor-color-overlay').value = selectedFrame.colorOverlay || false;
-		document.querySelector('#frame-editor-color-overlay').onchange = (event) => {selectedFrame.colorOverlay = event.target.value; drawFrames();}
+		document.querySelector('#frame-editor-color-overlay').onchange = (event) => { selectedFrame.colorOverlay = event.target.value; drawFrames(); }
 		document.querySelector('#frame-editor-hsl-hue').value = selectedFrame.hslHue || 0;
 		document.querySelector('#frame-editor-hsl-hue-slider').value = selectedFrame.hslHue || 0;
-		document.querySelector('#frame-editor-hsl-hue').onchange = (event) => {selectedFrame.hslHue = event.target.value; drawFrames();}
-		document.querySelector('#frame-editor-hsl-hue-slider').onchange = (event) => {selectedFrame.hslHue = event.target.value; drawFrames();}
+		document.querySelector('#frame-editor-hsl-hue').onchange = (event) => { selectedFrame.hslHue = event.target.value; drawFrames(); }
+		document.querySelector('#frame-editor-hsl-hue-slider').onchange = (event) => { selectedFrame.hslHue = event.target.value; drawFrames(); }
 		document.querySelector('#frame-editor-hsl-saturation').value = selectedFrame.hslSaturation || 0;
 		document.querySelector('#frame-editor-hsl-saturation-slider').value = selectedFrame.hslSaturation || 0;
-		document.querySelector('#frame-editor-hsl-saturation').onchange = (event) => {selectedFrame.hslSaturation = event.target.value; drawFrames();}
-		document.querySelector('#frame-editor-hsl-saturation-slider').onchange = (event) => {selectedFrame.hslSaturation = event.target.value; drawFrames();}
+		document.querySelector('#frame-editor-hsl-saturation').onchange = (event) => { selectedFrame.hslSaturation = event.target.value; drawFrames(); }
+		document.querySelector('#frame-editor-hsl-saturation-slider').onchange = (event) => { selectedFrame.hslSaturation = event.target.value; drawFrames(); }
 		document.querySelector('#frame-editor-hsl-lightness').value = selectedFrame.hslLightness || 0;
 		document.querySelector('#frame-editor-hsl-lightness-slider').value = selectedFrame.hslLightness || 0;
-		document.querySelector('#frame-editor-hsl-lightness').onchange = (event) => {selectedFrame.hslLightness = event.target.value; drawFrames();}
-		document.querySelector('#frame-editor-hsl-lightness-slider').onchange = (event) => {selectedFrame.hslLightness = event.target.value; drawFrames();}
+		document.querySelector('#frame-editor-hsl-lightness').onchange = (event) => { selectedFrame.hslLightness = event.target.value; drawFrames(); }
+		document.querySelector('#frame-editor-hsl-lightness-slider').onchange = (event) => { selectedFrame.hslLightness = event.target.value; drawFrames(); }
 		// Removing masks
 		const selectMaskElement = document.querySelector('#frame-editor-masks');
 		selectMaskElement.innerHTML = null;
@@ -1055,15 +1055,15 @@ function frameElementMaskRemoved() {
 	}
 }
 function uploadMaskOption(imageSource) {
-	const uploadedMask = {name:`Uploaded Image (${customCount})`, src:imageSource, noThumb:true, image: new Image()};
-	customCount ++;
+	const uploadedMask = { name: `Uploaded Image (${customCount})`, src: imageSource, noThumb: true, image: new Image() };
+	customCount++;
 	selectedFrame.masks.push(uploadedMask);
 	uploadedMask.image.onload = drawFrames;
 	uploadedMask.image.src = imageSource;
 }
 function uploadFrameOption(imageSource) {
-	const uploadedFrame = {name:`Uploaded Image (${customCount})`, src:imageSource, noThumb:true};
-	customCount ++;
+	const uploadedFrame = { name: `Uploaded Image (${customCount})`, src: imageSource, noThumb: true };
+	customCount++;
 	availableFrames.push(uploadedFrame);
 	loadFramePack();
 }
@@ -1089,7 +1089,7 @@ function hsl(canvas, inputH, inputS, inputL) {
 		l = res[2];
 		//make adjustments
 		h += hue;
-		while (h > 1) {h --;}
+		while (h > 1) { h--; }
 		s = Math.min(Math.max(s + saturation, 0), 1);
 		l = Math.min(Math.max(l + lightness, 0), 1);
 		//convert back to rgb
@@ -1120,8 +1120,8 @@ function croppedCanvas(oldCanvas, sensitivity = 0) {
 			}
 		}
 	}
-	pixX.sort(function(a, b) { return a - b });
-	pixY.sort(function(a, b) { return a - b });
+	pixX.sort(function (a, b) { return a - b });
+	pixY.sort(function (a, b) { return a - b });
 	var n = pixX.length - 1;
 	var newWidth = 1 + pixX[n] - pixX[0];
 	var newHeight = 1 + pixY[n] - pixY[0];
@@ -1133,54 +1133,54 @@ function croppedCanvas(oldCanvas, sensitivity = 0) {
 /*
 shoutout to https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion for providing the hsl-rgb conversion algorithms
 */
-function rgbToHSL(r, g, b){
-    r /= 255, g /= 255, b /= 255;
-    var max = Math.max(r, g, b), min = Math.min(r, g, b);
-    var h, s, l = (max + min) / 2;
+function rgbToHSL(r, g, b) {
+	r /= 255, g /= 255, b /= 255;
+	var max = Math.max(r, g, b), min = Math.min(r, g, b);
+	var h, s, l = (max + min) / 2;
 
-    if(max == min){
-        h = s = 0; // achromatic
-    }else{
-        var d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch(max){
-            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-            case g: h = (b - r) / d + 2; break;
-            case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-    }
+	if (max == min) {
+		h = s = 0; // achromatic
+	} else {
+		var d = max - min;
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+		switch (max) {
+			case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+			case g: h = (b - r) / d + 2; break;
+			case b: h = (r - g) / d + 4; break;
+		}
+		h /= 6;
+	}
 
-    return [h, s, l];
+	return [h, s, l];
 }
-function hslToRGB(h, s, l){
-    var r, g, b;
+function hslToRGB(h, s, l) {
+	var r, g, b;
 
-    if(s == 0){
-        r = g = b = l; // achromatic
-    }else{
-        var hue2rgb = function hue2rgb(p, q, t){
-            if(t < 0) t += 1;
-            if(t > 1) t -= 1;
-            if(t < 1/6) return p + (q - p) * 6 * t;
-            if(t < 1/2) return q;
-            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-            return p;
-        }
+	if (s == 0) {
+		r = g = b = l; // achromatic
+	} else {
+		var hue2rgb = function hue2rgb(p, q, t) {
+			if (t < 0) t += 1;
+			if (t > 1) t -= 1;
+			if (t < 1 / 6) return p + (q - p) * 6 * t;
+			if (t < 1 / 2) return q;
+			if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+			return p;
+		}
 
-        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        var p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1/3);
-        g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1/3);
-    }
+		var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+		var p = 2 * l - q;
+		r = hue2rgb(p, q, h + 1 / 3);
+		g = hue2rgb(p, q, h);
+		b = hue2rgb(p, q, h - 1 / 3);
+	}
 
-    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+	return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 //TEXT TAB
 var writingText;
 var autoFrameTimer;
-function loadTextOptions(textObject, replace=true) {
+function loadTextOptions(textObject, replace = true) {
 	var oldCardText = card.text || {};
 	Object.entries(oldCardText).forEach(item => {
 		savedTextContents[item[0]] = oldCardText[item[0]].text;
@@ -1219,13 +1219,13 @@ function textboxEditor() {
 	var selectedTextbox = card.text[Object.keys(card.text)[selectedTextIndex]];
 	document.querySelector('#textbox-editor').classList.add('opened');
 	document.querySelector('#textbox-editor-x').value = scaleWidth(selectedTextbox.x || 0);
-	document.querySelector('#textbox-editor-x').onchange = (event) => {selectedTextbox.x = (event.target.value / card.width); textEdited();}
+	document.querySelector('#textbox-editor-x').onchange = (event) => { selectedTextbox.x = (event.target.value / card.width); textEdited(); }
 	document.querySelector('#textbox-editor-y').value = scaleHeight(selectedTextbox.y || 0);
-	document.querySelector('#textbox-editor-y').onchange = (event) => {selectedTextbox.y = (event.target.value / card.height); textEdited();}
+	document.querySelector('#textbox-editor-y').onchange = (event) => { selectedTextbox.y = (event.target.value / card.height); textEdited(); }
 	document.querySelector('#textbox-editor-width').value = scaleWidth(selectedTextbox.width || 1);
-	document.querySelector('#textbox-editor-width').onchange = (event) => {selectedTextbox.width = (event.target.value / card.width); textEdited();}
+	document.querySelector('#textbox-editor-width').onchange = (event) => { selectedTextbox.width = (event.target.value / card.width); textEdited(); }
 	document.querySelector('#textbox-editor-height').value = scaleHeight(selectedTextbox.height || 1);
-	document.querySelector('#textbox-editor-height').onchange = (event) => {selectedTextbox.height = (event.target.value / card.height); textEdited();}
+	document.querySelector('#textbox-editor-height').onchange = (event) => { selectedTextbox.height = (event.target.value / card.height); textEdited(); }
 }
 function textEdited() {
 	card.text[Object.keys(card.text)[selectedTextIndex]].text = curlyQuotes(document.querySelector('#text-editor').value);
@@ -1491,7 +1491,7 @@ function writeText(textObject, targetContext) {
 	if (card.version == 'pokemon') {
 		rawText = rawText.replace(/{flavor}/g, '{oldflavor}{fontsize-20}{fontgillsansbolditalic}');
 	} else if (card.version == 'dossier') {
-		rawText = rawText.replace(/{flavor}(.*)/g, function(v) { return '{/indent}{lns}{bar}{lns}{fixtextalign}' + v.replace(/{flavor}/g, '').toUpperCase(); });
+		rawText = rawText.replace(/{flavor}(.*)/g, function (v) { return '{/indent}{lns}{bar}{lns}{fixtextalign}' + v.replace(/{flavor}/g, '').toUpperCase(); });
 	} else if (!card.showsFlavorBar) {
 		rawText = rawText.replace(/{flavor}/g, '{oldflavor}');
 	}
@@ -1524,7 +1524,7 @@ function writeText(textObject, targetContext) {
 				item.split('').forEach(char => {
 					if (char == '’') {
 						newSplitText.push(`{right${startingTextSize * 0.6}}`, '’', '{lns}', `{up${startingTextSize * 0.75}}`);
-					} else if (textManaCost && index == splitText.length-1) {
+					} else if (textManaCost && index == splitText.length - 1) {
 						newSplitText.push(char);
 					} else {
 						newSplitText.push(char, '{lns}');
@@ -1548,71 +1548,71 @@ function writeText(textObject, targetContext) {
 		if (textObject.conditionalColor != undefined) {
 			var codeParams = textObject.conditionalColor.split(":");
 			const tagParts = codeParams[0].split(",");
-		    const colorToApply = codeParams[1];
+			const colorToApply = codeParams[1];
 
-		    for (let part of tagParts) {
+			for (let part of tagParts) {
 
-		        // Split into frame name + mask rules
-		        const [rawFrameName, ...maskRuleParts] = part.split("*");
-		        const frameName = rawFrameName.replace(/_/g, " ").toLowerCase();
+				// Split into frame name + mask rules
+				const [rawFrameName, ...maskRuleParts] = part.split("*");
+				const frameName = rawFrameName.replace(/_/g, " ").toLowerCase();
 
-		        const positiveMasks = [];
-		        const negativeMasks = [];
+				const positiveMasks = [];
+				const negativeMasks = [];
 
-		        for (let rule of maskRuleParts) {
-		            if (!rule) continue;
-		            if (rule.startsWith("!")) {
-		                negativeMasks.push(rule.substring(1).replace(/_/g, " ").toLowerCase());
-		            } else {
-		                positiveMasks.push(rule.replace(/_/g, " ").toLowerCase());
-		            }
-		        }
+				for (let rule of maskRuleParts) {
+					if (!rule) continue;
+					if (rule.startsWith("!")) {
+						negativeMasks.push(rule.substring(1).replace(/_/g, " ").toLowerCase());
+					} else {
+						positiveMasks.push(rule.replace(/_/g, " ").toLowerCase());
+					}
+				}
 
-		        const matchingFrames = card.frames.filter(f =>
-		            f.name.toLowerCase().includes(frameName)
-		        );
+				const matchingFrames = card.frames.filter(f =>
+					f.name.toLowerCase().includes(frameName)
+				);
 
-		        for (const frame of matchingFrames) {
-		            const masks = frame.masks || [];
+				for (const frame of matchingFrames) {
+					const masks = frame.masks || [];
 
-		            // --------------------------------------
-		            // SPECIAL RULE:
-		            // If NO masks → always match immediately
-		            // --------------------------------------
-		            if (masks.length === 0) {
-		                textColor = colorToApply;
-		                lineContext.fillStyle = textColor;
-		                continue;
-		            }
+					// --------------------------------------
+					// SPECIAL RULE:
+					// If NO masks → always match immediately
+					// --------------------------------------
+					if (masks.length === 0) {
+						textColor = colorToApply;
+						lineContext.fillStyle = textColor;
+						continue;
+					}
 
-		            const maskNames = masks.map(m => m.name.toLowerCase());
+					const maskNames = masks.map(m => m.name.toLowerCase());
 
-		            // --- Positive mask rules -------------------------
-		            let passesPositive = true;
+					// --- Positive mask rules -------------------------
+					let passesPositive = true;
 
-		            if (positiveMasks.length > 0) {
-		                passesPositive = positiveMasks.every(pos =>
-		                    maskNames.some(mask => mask.includes(pos))
-		                );
-		            }
+					if (positiveMasks.length > 0) {
+						passesPositive = positiveMasks.every(pos =>
+							maskNames.some(mask => mask.includes(pos))
+						);
+					}
 
-		            if (!passesPositive) continue;
+					if (!passesPositive) continue;
 
-		            // --- Negative mask rules -------------------------
-		            let passesNegative = true;
+					// --- Negative mask rules -------------------------
+					let passesNegative = true;
 
-		            if (negativeMasks.length > 0) {
-		                passesNegative = negativeMasks.every(neg =>
-		                    !maskNames.some(mask => mask.includes(neg))
-		                );
-		            }
+					if (negativeMasks.length > 0) {
+						passesNegative = negativeMasks.every(neg =>
+							!maskNames.some(mask => mask.includes(neg))
+						);
+					}
 
-		            if (!passesNegative) continue;
+					if (!passesNegative) continue;
 
-		            // All conditions passed
-		            textColor = colorToApply;
-		        }
-		    }
+					// All conditions passed
+					textColor = colorToApply;
+				}
+			}
 		}
 		var textFont = textObject.font || 'mplantin';
 		FontLoadTracker.track(textFont);
@@ -1718,10 +1718,10 @@ function writeText(textObject, targetContext) {
 						textFontStyle = textFontStyle.replace('italic ', '');
 					} else {
 						textFontExtension = '';
-						if (!textFontStyle.includes('italic')) {textFontStyle += 'italic ';}
+						if (!textFontStyle.includes('italic')) { textFontStyle += 'italic '; }
 					}
 					lineContext.font = textFontStyle + textSize + 'px ' + textFont + textFontExtension;
-				} else if (possibleCode == '/i') {
+				} else if (possibleCode == 'i') {
 					textFontExtension = '';
 					textFontStyle = textFontStyle.replace('italic ', '');
 					lineContext.font = textFontStyle + textSize + 'px ' + textFont + textFontExtension;
@@ -1729,7 +1729,7 @@ function writeText(textObject, targetContext) {
 					if (textFont == 'gillsans') {
 						textFontExtension = 'bold';
 					} else {
-						if (!textFontStyle.includes('bold')) {textFontStyle += 'bold ';}
+						if (!textFontStyle.includes('bold')) { textFontStyle += 'bold '; }
 					}
 					lineContext.font = textFontStyle + textSize + 'px ' + textFont + textFontExtension;
 				} else if (possibleCode == '/bold') {
@@ -1752,84 +1752,84 @@ function writeText(textObject, targetContext) {
 				} else if (possibleCode == 'justify-right') {
 					textJustify = 'right';
 				} else if (possibleCode.startsWith('ruby:')) {
-					var rubyState = {currentX:currentX, currentY:currentY, lineY:lineY, widestLineWidth:widestLineWidth, newLineSpacing:newLineSpacing};
+					var rubyState = { currentX: currentX, currentY: currentY, lineY: lineY, widestLineWidth: widestLineWidth, newLineSpacing: newLineSpacing };
 					drawRubyText(word, textObject, lineContext, paragraphContext, lineCanvas, rubyGlobalAnnSize, rubyState, {
-						textSize:textSize, textFontStyle:textFontStyle, textFont:textFont, textFontExtension:textFontExtension,
-						textFontHeightRatio:textFontHeightRatio, textAlign:textAlign, textWidth:textWidth, textArcRadius:textArcRadius,
-						textOneLine:textOneLine, textOutlineWidth:textOutlineWidth, canvasMargin:canvasMargin, startingCurrentX:startingCurrentX
+						textSize: textSize, textFontStyle: textFontStyle, textFont: textFont, textFontExtension: textFontExtension,
+						textFontHeightRatio: textFontHeightRatio, textAlign: textAlign, textWidth: textWidth, textArcRadius: textArcRadius,
+						textOneLine: textOneLine, textOutlineWidth: textOutlineWidth, canvasMargin: canvasMargin, startingCurrentX: startingCurrentX
 					});
 					currentX = rubyState.currentX; currentY = rubyState.currentY; lineY = rubyState.lineY;
 					widestLineWidth = rubyState.widestLineWidth; newLineSpacing = rubyState.newLineSpacing;
 					wordToWrite = null;
 				} else if (possibleCode.includes('conditionalcolor')) {
-				    const codeParams = possibleCode.split(":");
-				    const tagParts = codeParams[1].split(",");
-				    const colorToApply = codeParams[2];
+					const codeParams = possibleCode.split(":");
+					const tagParts = codeParams[1].split(",");
+					const colorToApply = codeParams[2];
 
-				    for (let part of tagParts) {
+					for (let part of tagParts) {
 
-				        // Split into frame name + mask rules
-				        const [rawFrameName, ...maskRuleParts] = part.split("*");
-				        const frameName = rawFrameName.replace(/_/g, " ").toLowerCase();
+						// Split into frame name + mask rules
+						const [rawFrameName, ...maskRuleParts] = part.split("*");
+						const frameName = rawFrameName.replace(/_/g, " ").toLowerCase();
 
-				        const positiveMasks = [];
-				        const negativeMasks = [];
+						const positiveMasks = [];
+						const negativeMasks = [];
 
-				        for (let rule of maskRuleParts) {
-				            if (!rule) continue;
-				            if (rule.startsWith("!")) {
-				                negativeMasks.push(rule.substring(1).replace(/_/g, " ").toLowerCase());
-				            } else {
-				                positiveMasks.push(rule.replace(/_/g, " ").toLowerCase());
-				            }
-				        }
+						for (let rule of maskRuleParts) {
+							if (!rule) continue;
+							if (rule.startsWith("!")) {
+								negativeMasks.push(rule.substring(1).replace(/_/g, " ").toLowerCase());
+							} else {
+								positiveMasks.push(rule.replace(/_/g, " ").toLowerCase());
+							}
+						}
 
-				        const matchingFrames = card.frames.filter(f =>
-				            f.name.toLowerCase().includes(frameName)
-				        );
+						const matchingFrames = card.frames.filter(f =>
+							f.name.toLowerCase().includes(frameName)
+						);
 
-				        for (const frame of matchingFrames) {
-				            const masks = frame.masks || [];
+						for (const frame of matchingFrames) {
+							const masks = frame.masks || [];
 
-				            // --------------------------------------
-				            // SPECIAL RULE:
-				            // If NO masks → always match immediately
-				            // --------------------------------------
-				            if (masks.length === 0) {
-				                textColor = colorToApply;
-				                lineContext.fillStyle = textColor;
-				                continue;
-				            }
+							// --------------------------------------
+							// SPECIAL RULE:
+							// If NO masks → always match immediately
+							// --------------------------------------
+							if (masks.length === 0) {
+								textColor = colorToApply;
+								lineContext.fillStyle = textColor;
+								continue;
+							}
 
-				            const maskNames = masks.map(m => m.name.toLowerCase());
+							const maskNames = masks.map(m => m.name.toLowerCase());
 
-				            // --- Positive mask rules -------------------------
-				            let passesPositive = true;
+							// --- Positive mask rules -------------------------
+							let passesPositive = true;
 
-				            if (positiveMasks.length > 0) {
-				                passesPositive = positiveMasks.every(pos =>
-				                    maskNames.some(mask => mask.includes(pos))
-				                );
-				            }
+							if (positiveMasks.length > 0) {
+								passesPositive = positiveMasks.every(pos =>
+									maskNames.some(mask => mask.includes(pos))
+								);
+							}
 
-				            if (!passesPositive) continue;
+							if (!passesPositive) continue;
 
-				            // --- Negative mask rules -------------------------
-				            let passesNegative = true;
+							// --- Negative mask rules -------------------------
+							let passesNegative = true;
 
-				            if (negativeMasks.length > 0) {
-				                passesNegative = negativeMasks.every(neg =>
-				                    !maskNames.some(mask => mask.includes(neg))
-				                );
-				            }
+							if (negativeMasks.length > 0) {
+								passesNegative = negativeMasks.every(neg =>
+									!maskNames.some(mask => mask.includes(neg))
+								);
+							}
 
-				            if (!passesNegative) continue;
+							if (!passesNegative) continue;
 
-				            // All conditions passed
-				            textColor = colorToApply;
-				            lineContext.fillStyle = textColor;
-				        }
-				    }
+							// All conditions passed
+							textColor = colorToApply;
+							lineContext.fillStyle = textColor;
+						}
+					}
 				} else if (possibleCode.includes('fontcolor')) {
 					textColor = possibleCode.replace('fontcolor', '');
 					lineContext.fillStyle = textColor;
@@ -1897,7 +1897,7 @@ function writeText(textObject, targetContext) {
 				} else if (possibleCode == 'indent') {
 					startingCurrentX += currentX;
 					currentY -= 10;
-				} else if (possibleCode == '/indent') {
+				} else if (possibleCode == 'indent') {
 					startingCurrentX = 0;
 				} else if (possibleCode.includes('elemid')) {
 					if (document.querySelector('#' + word.replace('{elemid', '').replace('}', ''))) {
@@ -1962,7 +1962,7 @@ function writeText(textObject, targetContext) {
 					var possibleCode = possibleCode.replaceAll('/', '');
 					var manaSymbol;
 					// Add symbol to render queue without drawing immediately
-					if (textObject.manaPrefix && 
+					if (textObject.manaPrefix &&
 						(getManaSymbol(textObject.manaPrefix + possibleCode) != undefined || getManaSymbol(textObject.manaPrefix + possibleCode.split('').reverse().join('')) != undefined)) {
 						manaSymbol = getManaSymbol(textObject.manaPrefix + possibleCode) || getManaSymbol(textObject.manaPrefix + possibleCode.split('').reverse().join(''));
 					} else {
@@ -1970,7 +1970,7 @@ function writeText(textObject, targetContext) {
 							possibleCode = 'whitebrush';
 						}
 						manaSymbol = getManaSymbol(possibleCode) || getManaSymbol(possibleCode.split('').reverse().join(''));
-					} 
+					}
 
 					var origManaSymbolColor = manaSymbolColor;
 					if (manaSymbol.matchColor && !manaSymbolColor && textColor !== 'black') {
@@ -1986,13 +1986,13 @@ function writeText(textObject, targetContext) {
 						manaSymbolX = scaleWidth(textObject.manaPlacement.x[manaPlacementCounter] || 0) + canvasMargin;
 						manaSymbolY = canvasMargin;
 						currentY = scaleHeight(textObject.manaPlacement.y[manaPlacementCounter] || 0);
-						manaPlacementCounter ++;
+						manaPlacementCounter++;
 						newLine = true;
 					} else if (textObject.manaLayout) {
 						var layoutOption = 0;
 						var manaSymbolCount = splitText.length - 1;
 						while (textObject.manaLayout[layoutOption].max < manaSymbolCount && layoutOption < textObject.manaLayout.length - 1) {
-							layoutOption ++;
+							layoutOption++;
 						}
 						var manaLayout = textObject.manaLayout[layoutOption];
 						if (manaLayout.pos[manaPlacementCounter] == undefined) {
@@ -2001,7 +2001,7 @@ function writeText(textObject, targetContext) {
 						manaSymbolX = scaleWidth(manaLayout.pos[manaPlacementCounter][0] || 0) + canvasMargin;
 						manaSymbolY = canvasMargin;
 						currentY = scaleHeight(manaLayout.pos[manaPlacementCounter][1] || 0);
-						manaPlacementCounter ++;
+						manaPlacementCounter++;
 						manaSymbolWidth *= manaLayout.size;
 						manaSymbolHeight *= manaLayout.size;
 						newLine = true;
@@ -2021,7 +2021,7 @@ function writeText(textObject, targetContext) {
 					manaSymbolsToRender.push({
 						symbol: manaSymbol,
 						x: manaSymbolX,
-						y: manaSymbolY, 
+						y: manaSymbolY,
 						width: manaSymbolWidth,
 						height: manaSymbolHeight,
 						hasOutline: textOutlineWidth > 0,
@@ -2052,13 +2052,13 @@ function writeText(textObject, targetContext) {
 
 				// Check if any symbols actually need outlines
 				var hasAnyOutlines = manaSymbolsToRender.some(symbolData => symbolData.hasOutline);
-				
+
 				if (!hasAnyOutlines) {
 					// Simple path: no outlines needed, just draw symbols normally
 					manaSymbolsToRender.forEach(symbolData => {
 						var imageToUse = symbolData.symbol.image;
 						var backImageToUse = symbolData.backImage;
-						
+
 						// For Safari, create a combined canvas first, then apply shadow
 						if (isSafari && (symbolData.symbol.image.src?.includes('.svg') || (backImageToUse?.src?.includes('.svg')))) {
 							// Create a combined canvas for both symbols
@@ -2066,27 +2066,27 @@ function writeText(textObject, targetContext) {
 							combinedCanvas.width = symbolData.width;
 							combinedCanvas.height = symbolData.height;
 							var combinedContext = combinedCanvas.getContext('2d');
-							
+
 							// Draw back image first (if exists)
 							if (symbolData.symbol.backs && backImageToUse) {
 								combinedContext.drawImage(backImageToUse, 0, 0, symbolData.width, symbolData.height);
 							}
-							
+
 							// Draw main symbol on top
 							combinedContext.drawImage(symbolData.symbol.image, 0, 0, symbolData.width, symbolData.height);
-							
+
 							// Now use the combined canvas as the image source
 							imageToUse = combinedCanvas;
 							backImageToUse = null; // Don't draw back separately since it's already combined
 						}
-						
+
 						if (symbolData.radius > 0) {
 							if (symbolData.symbol.backs && backImageToUse) {
-								lineContext.drawImageArc(backImageToUse, symbolData.x, symbolData.y, 
-									symbolData.width, symbolData.height, symbolData.radius, 
+								lineContext.drawImageArc(backImageToUse, symbolData.x, symbolData.y,
+									symbolData.width, symbolData.height, symbolData.radius,
 									symbolData.arcStart, symbolData.currentX);
 							}
-							lineContext.drawImageArc(imageToUse, symbolData.x, symbolData.y, 
+							lineContext.drawImageArc(imageToUse, symbolData.x, symbolData.y,
 								symbolData.width, symbolData.height, symbolData.radius,
 								symbolData.arcStart, symbolData.currentX);
 						} else if (symbolData.color) {
@@ -2101,14 +2101,14 @@ function writeText(textObject, targetContext) {
 								symbolData.width, symbolData.height);
 						}
 					});
-					
+
 					manaSymbolsToRender = [];
 					return; // This exits the function completely - no complex rendering
 				}
 
 				// Complex path: outlines needed, do multi-pass rendering
 				// This code should ONLY run when hasAnyOutlines is true
-				var outlineCanvas = lineCanvas.cloneNode(); 
+				var outlineCanvas = lineCanvas.cloneNode();
 				var outlineContext = outlineCanvas.getContext('2d');
 				var symbolCanvas = lineCanvas.cloneNode();
 				var symbolContext = symbolCanvas.getContext('2d');
@@ -2123,14 +2123,14 @@ function writeText(textObject, targetContext) {
 				tempContext.drawImage(lineCanvas, 0, 0);
 				// Clear the line context
 				lineContext.clearRect(0, 0, lineCanvas.width, lineCanvas.height);
-				
+
 				// First pass: Draw outlines only
 				manaSymbolsToRender.forEach(symbolData => {
 					if (!symbolData.hasOutline) return;
 					outlineContext.fillStyle = 'black';
 					outlineContext.beginPath();
-					var centerX = symbolData.x + symbolData.width/2;
-					var centerY = symbolData.y + symbolData.height/2;
+					var centerX = symbolData.x + symbolData.width / 2;
+					var centerY = symbolData.y + symbolData.height / 2;
 					var baseRadius = Math.max(symbolData.width, symbolData.height) / 2;
 					// Fix: Use half the outline width to match text rendering behavior
 					var outlineRadius = baseRadius + (symbolData.outlineWidth || 0) / 2;
@@ -2139,15 +2139,15 @@ function writeText(textObject, targetContext) {
 				});
 				// Transfer outlines to main canvas
 				lineContext.drawImage(outlineCanvas, 0, 0);
-				
+
 				// Restore text content on top of outlines
 				lineContext.drawImage(tempCanvas, 0, 0);
-				
+
 				// Second pass: Draw mana symbols
 				manaSymbolsToRender.forEach(symbolData => {
 					var imageToUse = symbolData.symbol.image;
 					var backImageToUse = symbolData.backImage;
-					
+
 					// For Safari, create a combined canvas first, then apply shadow
 					if (isSafari && (symbolData.symbol.image.src?.includes('.svg') || (backImageToUse?.src?.includes('.svg')))) {
 						// Create a combined canvas for both symbols
@@ -2155,27 +2155,27 @@ function writeText(textObject, targetContext) {
 						combinedCanvas.width = symbolData.width;
 						combinedCanvas.height = symbolData.height;
 						var combinedContext = combinedCanvas.getContext('2d');
-						
+
 						// Draw back image first (if exists)
 						if (symbolData.symbol.backs && backImageToUse) {
 							combinedContext.drawImage(backImageToUse, 0, 0, symbolData.width, symbolData.height);
 						}
-						
+
 						// Draw main symbol on top
 						combinedContext.drawImage(symbolData.symbol.image, 0, 0, symbolData.width, symbolData.height);
-						
+
 						// Now use the combined canvas as the image source
 						imageToUse = combinedCanvas;
 						backImageToUse = null; // Don't draw back separately since it's already combined
 					}
-					
+
 					if (symbolData.radius > 0) {
 						if (symbolData.symbol.backs && backImageToUse) {
-							symbolContext.drawImageArc(backImageToUse, symbolData.x, symbolData.y, 
-								symbolData.width, symbolData.height, symbolData.radius, 
+							symbolContext.drawImageArc(backImageToUse, symbolData.x, symbolData.y,
+								symbolData.width, symbolData.height, symbolData.radius,
 								symbolData.arcStart, symbolData.currentX);
 						}
-						symbolContext.drawImageArc(imageToUse, symbolData.x, symbolData.y, 
+						symbolContext.drawImageArc(imageToUse, symbolData.x, symbolData.y,
 							symbolData.width, symbolData.height, symbolData.radius,
 							symbolData.arcStart, symbolData.currentX);
 					} else if (symbolData.color) {
@@ -2193,7 +2193,7 @@ function writeText(textObject, targetContext) {
 
 				// Draw symbols on top of text
 				lineContext.drawImage(symbolCanvas, 0, 0);
-				
+
 				manaSymbolsToRender = [];
 			}
 			if (wordToWrite && lineContext.font.endsWith('belerenb')) {
@@ -2335,7 +2335,7 @@ function writeText(textObject, targetContext) {
 	}
 }
 
-CanvasRenderingContext2D.prototype.fillTextArc = function(text, x, y, radius, startRotation, distance = 0, outlineWidth = 0) {
+CanvasRenderingContext2D.prototype.fillTextArc = function (text, x, y, radius, startRotation, distance = 0, outlineWidth = 0) {
 	this.save();
 	this.translate(x - distance + scaleWidth(0.5), y + radius);
 	this.rotate(startRotation + widthToAngle(distance, radius));
@@ -2349,14 +2349,14 @@ CanvasRenderingContext2D.prototype.fillTextArc = function(text, x, y, radius, st
 	}
 	this.restore();
 }
-CanvasRenderingContext2D.prototype.drawImageArc = function(image, x, y, width, height, radius, startRotation, distance = 0) {
+CanvasRenderingContext2D.prototype.drawImageArc = function (image, x, y, width, height, radius, startRotation, distance = 0) {
 	this.save();
 	this.translate(x - distance + scaleWidth(0.5), y + radius);
 	this.rotate(startRotation + widthToAngle(distance, radius));
 	this.drawImage(image, 0, -radius, width, height);
 	this.restore();
 }
-CanvasRenderingContext2D.prototype.fillImage = function(image, x, y, width, height, color = 'white', margin = 10) {
+CanvasRenderingContext2D.prototype.fillImage = function (image, x, y, width, height, color = 'white', margin = 10) {
 	var canvas = document.createElement('canvas');
 	canvas.width = width + margin * 2;
 	canvas.height = height + margin * 2;
@@ -2401,22 +2401,22 @@ function renderTextJustified(ctx, text, x, y, width, renderType) {
 		return totalWidth;
 	}
 	renderer = renderType === FILL ? ctx.fillText.bind(ctx) : ctx.strokeText.bind(ctx); // fill or stroke
-	switch(textAlign) {
-	case "right":
-		x -= totalWidth;
-		break;
-	case "end":
-		x += width - totalWidth;
-		break;
-	case "center": // intentional fall through to default
-		x -= totalWidth / 2;
-	default:
+	switch (textAlign) {
+		case "right":
+			x -= totalWidth;
+			break;
+		case "end":
+			x += width - totalWidth;
+			break;
+		case "center": // intentional fall through to default
+			x -= totalWidth / 2;
+		default:
 	}
 	if (useSize === spaceWidth) { // if space size unchanged
 		renderer(text, x, y);
 	} else {
-		for(i = 0; i < count; i += 1) {
-			renderer(words[i].word,x,y);
+		for (i = 0; i < count; i += 1) {
+			renderer(words[i].word, x, y);
 			x += words[i].width;
 			x += useSize;
 		}
@@ -2426,34 +2426,34 @@ function renderTextJustified(ctx, text, x, y, width, renderType) {
 
 // Parse vet and set settings object.
 function justifiedTextSettings(settings) {
-	var min,max;
+	var min, max;
 	var vetNumber = (num, defaultNum) => {
 		num = num !== null && num !== null && !isNaN(num) ? num : defaultNum;
-		if(num < 0){
+		if (num < 0) {
 			num = defaultNum;
 		}
 		return num;
 	}
-	if(settings === undefined || settings === null){
+	if (settings === undefined || settings === null) {
 		return;
 	}
 	max = vetNumber(settings.maxSpaceSize, maxSpaceSize);
 	min = vetNumber(settings.minSpaceSize, minSpaceSize);
-	if(min > max){
+	if (min > max) {
 		return;
 	}
 	minSpaceSize = min;
 	maxSpaceSize = max;
 }
-CanvasRenderingContext2D.prototype.fillJustifyText = function(text, x, y, width, settings) {
+CanvasRenderingContext2D.prototype.fillJustifyText = function (text, x, y, width, settings) {
 	justifiedTextSettings(settings);
 	renderTextJustified(this, text, x, y, width, FILL);
 }
-CanvasRenderingContext2D.prototype.strokeJustifyText = function(text, x, y, width, settings){
+CanvasRenderingContext2D.prototype.strokeJustifyText = function (text, x, y, width, settings) {
 	justifiedTextSettings(settings);
 	renderTextJustified(this, text, x, y, width, STROKE);
 }
-CanvasRenderingContext2D.prototype.measureJustifiedText = function(text, width, settings) {
+CanvasRenderingContext2D.prototype.measureJustifiedText = function (text, width, settings) {
 	justifiedTextSettings(settings);
 	renderTextJustified(this, text, 0, 0, width, MEASURE);
 }
@@ -2469,16 +2469,16 @@ function pinlineColors(color) {
 }
 async function addTextbox(textboxType) {
 	if (textboxType == 'Nickname' && !card.text.nickname && card.text.title) {
-		await loadTextOptions({nickname: {name:'Nickname', text:card.text.title.text, x:0.14, y:0.1129, width:0.72, height:0.0243, oneLine:true, font:'mplantini', size:0.0229, color:'white', shadowX:0.0014, shadowY:0.001, align:'center'}}, false);
+		await loadTextOptions({ nickname: { name: 'Nickname', text: card.text.title.text, x: 0.14, y: 0.1129, width: 0.72, height: 0.0243, oneLine: true, font: 'mplantini', size: 0.0229, color: 'white', shadowX: 0.0014, shadowY: 0.001, align: 'center' } }, false);
 		var nickname = card.text.title;
 		nickname.name = 'Nickname';
 		card.text.title = card.text.nickname;
 		card.text.title.name = 'Title';
 		card.text.nickname = nickname;
 	} else if (textboxType == 'Power/Toughness' && !card.text.pt) {
-		loadTextOptions({pt: {name:'Power/Toughness', text:'', x:0.7928, y:0.902, width:0.1367, height:0.0372, size:0.0372, font:'belerenbsc', oneLine:true, align:'center'}}, false);
+		loadTextOptions({ pt: { name: 'Power/Toughness', text: '', x: 0.7928, y: 0.902, width: 0.1367, height: 0.0372, size: 0.0372, font: 'belerenbsc', oneLine: true, align: 'center' } }, false);
 	} else if (textboxType == 'DateStamp' && !card.text.dateStamp) {
-		loadTextOptions({dateStamp: {name:'Date Stamp', text:'', x:0.11, y:0.5072, width:0.78, height:0.0286, size:0.0286, font:'belerenb', oneLine:true, align:'right', color:'#ffd35b', shadowX:-0.0007, shadowY:-0.001}}, false);
+		loadTextOptions({ dateStamp: { name: 'Date Stamp', text: '', x: 0.11, y: 0.5072, width: 0.78, height: 0.0286, size: 0.0286, font: 'belerenb', oneLine: true, align: 'right', color: '#ffd35b', shadowX: -0.0007, shadowY: -0.001 } }, false);
 	}
 }
 //ART TAB
@@ -2486,35 +2486,35 @@ function uploadArt(imageSource, otherParams) {
 	ImageLoadTracker.track(imageSource);
 	art.src = imageSource;
 	if (otherParams && otherParams == 'autoFit') {
-		art.onload = function() {
+		art.onload = function () {
 			autoFitArt();
 			art.onload = artEdited;
 		};
 	}
 }
 async function pasteArt() {
-  try {
-    const clipboardItems = await navigator.clipboard.read();
-    
-    for (const item of clipboardItems) {
-      for (const type of item.types) {
-        if (type.startsWith('image/')) {
-          const blob = await item.getType(type);
-          
-          const url = URL.createObjectURL(blob);
+	try {
+		const clipboardItems = await navigator.clipboard.read();
 
-          uploadArt(url, document.querySelector("#art-update-autofit").checked ? "autoFit" : "");
-          // document.getElementById('preview').src = url;
-          return;
-        }
-      }
-    }
+		for (const item of clipboardItems) {
+			for (const type of item.types) {
+				if (type.startsWith('image/')) {
+					const blob = await item.getType(type);
 
-    notify('No image found in clipboard!');
-  } catch (err) {
-    console.error('Failed to read clipboard: ', err);
-    notify('Clipboard access not allowed or no image available.');
-  }
+					const url = URL.createObjectURL(blob);
+
+					uploadArt(url, document.querySelector("#art-update-autofit").checked ? "autoFit" : "");
+					// document.getElementById('preview').src = url;
+					return;
+				}
+			}
+		}
+
+		notify('No image found in clipboard!');
+	} catch (err) {
+		console.error('Failed to read clipboard: ', err);
+		notify('Clipboard access not allowed or no image available.');
+	}
 }
 function artEdited() {
 	card.artSource = art.src;
@@ -2566,7 +2566,7 @@ function artFromScryfall(scryfallResponse) {
 			option.innerHTML = `${card.name} (${card.set.toUpperCase()} - ${card.artist})`;
 			option.value = optionIndex;
 			artIndex.appendChild(option);
-			optionIndex ++;
+			optionIndex++;
 		}
 	});
 
@@ -2605,9 +2605,9 @@ function changeArtIndex() {
 }
 function tryMTGPicsArt(src) {
 	var attemptedImage = new Image();
-	attemptedImage.onload = function() {
+	attemptedImage.onload = function () {
 		if (this.complete) {
-			art.onload = function() {
+			art.onload = function () {
 				autoFitArt();
 				art.onload = artEdited;
 			};
@@ -2681,7 +2681,7 @@ function uploadSetSymbol(imageSource, otherParams) {
 	ImageLoadTracker.track(imageSource);
 	setSymbol.src = imageSource;
 	if (otherParams && otherParams == 'resetSetSymbol') {
-		setSymbol.onload = function() {
+		setSymbol.onload = function () {
 			resetSetSymbol();
 			setSymbol.onload = setSymbolEdited;
 		};
@@ -2730,27 +2730,27 @@ function fetchSetSymbol() {
 	}
 	var setRarity = document.querySelector('#set-symbol-rarity').value.toLowerCase().replace('uncommon', 'u').replace('common', 'c').replace('rare', 'r').replace('mythic', 'm') || 'c';
 	if (['a22', 'a23', 'j22', 'hlw'].includes(setCode.toLowerCase())) {
-		uploadSetSymbol(fixUri(`/img/setSymbols/custom/${setCode.toLowerCase()}-${setRarity}.png`), 'resetSetSymbol');
+		uploadSetSymbol(fixUri(`img/setSymbols/custom/${setCode.toLowerCase()}-${setRarity}.png`), 'resetSetSymbol');
 	} else if (['cc', 'logan', 'joe'].includes(setCode.toLowerCase())) {
-		uploadSetSymbol(fixUri(`/img/setSymbols/custom/${setCode.toLowerCase()}-${setRarity}.svg`), 'resetSetSymbol');
+		uploadSetSymbol(fixUri(`img/setSymbols/custom/${setCode.toLowerCase()}-${setRarity}.svg`), 'resetSetSymbol');
 	} else if (document.querySelector("#set-symbol-source").value == 'gatherer') {
 		if (setSymbolAliases.has(setCode.toLowerCase())) setCode = setSymbolAliases.get(setCode.toLowerCase());
 		uploadSetSymbol('http://gatherer.wizards.com/Handlers/Image.ashx?type=symbol&set=' + setCode + '&size=large&rarity=' + setRarity, 'resetSetSymbol');
-    } else if (document.querySelector("#set-symbol-source").value == 'hexproof') {
-        if (setSymbolAliases.has(setCode.toLowerCase())) setCode = setSymbolAliases.get(setCode.toLowerCase());
-        var hexproofUrl = 'https://api.hexproof.io/symbols/set/' + setCode + '/' + setRarity;
-        // Use CORS proxy for hexproof.io
-        if (params.get('noproxy') == null) {
-            hexproofUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(hexproofUrl);
-        }
-        uploadSetSymbol(hexproofUrl, 'resetSetSymbol');
+	} else if (document.querySelector("#set-symbol-source").value == 'hexproof') {
+		if (setSymbolAliases.has(setCode.toLowerCase())) setCode = setSymbolAliases.get(setCode.toLowerCase());
+		var hexproofUrl = 'https://api.hexproof.io/symbols/set/' + setCode + '/' + setRarity;
+		// Use CORS proxy for hexproof.io
+		if (params.get('noproxy') == null) {
+			hexproofUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(hexproofUrl);
+		}
+		uploadSetSymbol(hexproofUrl, 'resetSetSymbol');
 	} else {
 		var extension = 'svg';
 		if (['xxxx'].includes(setCode.toLowerCase())) {
 			extension = 'png';
 		}
 		if (setSymbolAliases.has(setCode.toLowerCase())) setCode = setSymbolAliases.get(setCode.toLowerCase());
-		uploadSetSymbol(fixUri(`/img/setSymbols/official/${setCode.toLowerCase()}-${setRarity}.` + extension), 'resetSetSymbol');
+		uploadSetSymbol(fixUri(`img/setSymbols/official/${setCode.toLowerCase()}-${setRarity}.` + extension), 'resetSetSymbol');
 	}
 }
 function lockSetSymbolCode() {
@@ -2772,7 +2772,7 @@ function uploadWatermark(imageSource, otherParams) {
 	ImageLoadTracker.track(imageSource);
 	watermark.src = imageSource;
 	if (otherParams && otherParams == 'resetWatermark') {
-		watermark.onload = function() {
+		watermark.onload = function () {
 			resetWatermark();
 			watermark.onload = watermarkEdited;
 		};
@@ -2845,10 +2845,10 @@ function getSetSymbolWatermark(url, targetImage = watermark) {
 	xhttp = new XMLHttpRequest();
 	xhttp.open('GET', url, true);
 	xhttp.overrideMimeType('image/svg+xml');
-	xhttp.onload = function(event) {
+	xhttp.onload = function (event) {
 		if (this.readyState == 4 && this.status == 200) {
-		    var svg = document.body.appendChild(xhttp.responseXML.documentElement);
-		    var box = svg.getBBox(svg);
+			var svg = document.body.appendChild(xhttp.responseXML.documentElement);
+			var box = svg.getBBox(svg);
 			svg.setAttribute('viewBox', [box.x, box.y, box.width, box.height].join(' '));
 			svg.setAttribute('width', box.width);
 			svg.setAttribute('height', box.height);
@@ -2903,8 +2903,8 @@ async function serialInfoEdited() {
 }
 
 async function resetSerial() {
-	card.serialX = scaleX(172/2010);
-	card.serialY = scaleY(1383/2814);
+	card.serialX = scaleX(172 / 2010);
+	card.serialY = scaleY(1383 / 2814);
 	card.serialScale = 1.0;
 
 	document.querySelector('#serial-x').value = card.serialX;
@@ -2974,65 +2974,65 @@ function setDefaultCollector() {
 	localStorage.setItem('defaultCollector', JSON.stringify(defaultCollector));
 }
 function drawSetSymbol(cardContext, setSymbol, bounds) {
-    if (!bounds) return;
-    
-    const symbolWidth = setSymbol.width * card.setSymbolZoom;
-    const symbolHeight = setSymbol.height * card.setSymbolZoom; 
-    const x = scaleX(card.setSymbolX);
-    const y = scaleY(card.setSymbolY);
+	if (!bounds) return;
 
-    if (bounds.outlineWidth && bounds.outlineWidth > 0) {
-        // Create temp canvas for outlined symbol
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
-        
-        // Scale the outline width the same way text outlines are scaled
-        const outlineWidth = scaleHeight(bounds.outlineWidth);
-        const margin = outlineWidth * 2;
-        tempCanvas.width = symbolWidth + margin;
-        tempCanvas.height = symbolHeight + margin;
-        
-        // Setup stroke style (similar to text outline system)
-        tempCtx.strokeStyle = bounds.outlineColor || 'black';
-        tempCtx.lineWidth = outlineWidth;
-        tempCtx.lineJoin = bounds.lineJoin || 'round';
-        tempCtx.lineCap = bounds.lineCap || 'round';
-        
-        // First pass: Draw outline by stroking the symbol multiple times in a circle pattern
-        const outlineSteps = Math.max(8, Math.ceil(outlineWidth * 2));
-        for (let i = 0; i < outlineSteps; i++) {
-            const angle = (i / outlineSteps) * Math.PI * 2;
-            const offsetX = Math.cos(angle) * (outlineWidth / 2);
-            const offsetY = Math.sin(angle) * (outlineWidth / 2);
-            
-            tempCtx.globalCompositeOperation = 'source-over';
-            tempCtx.drawImage(setSymbol, 
-                outlineWidth + offsetX, 
-                outlineWidth + offsetY, 
-                symbolWidth, 
-                symbolHeight);
-            
-            // Apply the outline color
-            tempCtx.globalCompositeOperation = 'source-in';
-            tempCtx.fillStyle = bounds.outlineColor || 'black';
-            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            tempCtx.globalCompositeOperation = 'destination-over';
-        }
-        
-        // Second pass: Draw the original symbol on top
-        tempCtx.globalCompositeOperation = 'source-over';
-        tempCtx.drawImage(setSymbol, outlineWidth, outlineWidth, symbolWidth, symbolHeight);
+	const symbolWidth = setSymbol.width * card.setSymbolZoom;
+	const symbolHeight = setSymbol.height * card.setSymbolZoom;
+	const x = scaleX(card.setSymbolX);
+	const y = scaleY(card.setSymbolY);
 
-        // Draw to main canvas
-        cardContext.drawImage(tempCanvas, 
-            x - outlineWidth, 
-            y - outlineWidth,
-            tempCanvas.width,
-            tempCanvas.height);
-    } else {
-        // Draw main symbol without outline (simple path)
-        cardContext.drawImage(setSymbol, x, y, symbolWidth, symbolHeight);
-    }
+	if (bounds.outlineWidth && bounds.outlineWidth > 0) {
+		// Create temp canvas for outlined symbol
+		const tempCanvas = document.createElement('canvas');
+		const tempCtx = tempCanvas.getContext('2d');
+
+		// Scale the outline width the same way text outlines are scaled
+		const outlineWidth = scaleHeight(bounds.outlineWidth);
+		const margin = outlineWidth * 2;
+		tempCanvas.width = symbolWidth + margin;
+		tempCanvas.height = symbolHeight + margin;
+
+		// Setup stroke style (similar to text outline system)
+		tempCtx.strokeStyle = bounds.outlineColor || 'black';
+		tempCtx.lineWidth = outlineWidth;
+		tempCtx.lineJoin = bounds.lineJoin || 'round';
+		tempCtx.lineCap = bounds.lineCap || 'round';
+
+		// First pass: Draw outline by stroking the symbol multiple times in a circle pattern
+		const outlineSteps = Math.max(8, Math.ceil(outlineWidth * 2));
+		for (let i = 0; i < outlineSteps; i++) {
+			const angle = (i / outlineSteps) * Math.PI * 2;
+			const offsetX = Math.cos(angle) * (outlineWidth / 2);
+			const offsetY = Math.sin(angle) * (outlineWidth / 2);
+
+			tempCtx.globalCompositeOperation = 'source-over';
+			tempCtx.drawImage(setSymbol,
+				outlineWidth + offsetX,
+				outlineWidth + offsetY,
+				symbolWidth,
+				symbolHeight);
+
+			// Apply the outline color
+			tempCtx.globalCompositeOperation = 'source-in';
+			tempCtx.fillStyle = bounds.outlineColor || 'black';
+			tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+			tempCtx.globalCompositeOperation = 'destination-over';
+		}
+
+		// Second pass: Draw the original symbol on top
+		tempCtx.globalCompositeOperation = 'source-over';
+		tempCtx.drawImage(setSymbol, outlineWidth, outlineWidth, symbolWidth, symbolHeight);
+
+		// Draw to main canvas
+		cardContext.drawImage(tempCanvas,
+			x - outlineWidth,
+			y - outlineWidth,
+			tempCanvas.width,
+			tempCanvas.height);
+	} else {
+		// Draw main symbol without outline (simple path)
+		cardContext.drawImage(setSymbol, x, y, symbolWidth, symbolHeight);
+	}
 }
 //DRAWING THE CARD (putting it all together)
 function drawCard() {
@@ -3044,7 +3044,7 @@ function drawCard() {
 	cardContext.translate(scaleX(card.artX), scaleY(card.artY));
 	cardContext.rotate(Math.PI / 180 * (card.artRotate || 0));
 	if (document.querySelector('#grayscale-art').checked) {
-		cardContext.filter='grayscale(1)';
+		cardContext.filter = 'grayscale(1)';
 	}
 	cardContext.drawImage(art, 0, 0, art.width * card.artZoom, art.height * card.artZoom);
 	cardContext.restore();
@@ -3083,7 +3083,7 @@ function drawCard() {
 	cardContext.drawImage(textCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
 	// set symbol
 	if (card.setSymbolBounds) {
-		drawSetSymbol(cardContext, setSymbol, card.setSymbolBounds); 
+		drawSetSymbol(cardContext, setSymbol, card.setSymbolBounds);
 	}
 	// serial
 	if (card.serialNumber || card.serialTotal) {
@@ -3091,33 +3091,33 @@ function drawCard() {
 		var y = parseInt(card.serialY) || 1383;
 		var scale = parseFloat(card.serialScale) || 1.0;
 
-		cardContext.drawImage(serial, scaleX(x/2010), scaleY(y/2814), scaleWidth(464/2010) * scale, scaleHeight(143/2814) * scale);
+		cardContext.drawImage(serial, scaleX(x / 2010), scaleY(y / 2814), scaleWidth(464 / 2010) * scale, scaleHeight(143 / 2814) * scale);
 
 		var number = {
-			name:"Number",
+			name: "Number",
 			text: '{kerning3}' + card.serialNumber || '',
-			x: (x+(30 * scale))/2010,
-			y: (y+(52 * scale))/2814,
-			width: (190 * scale)/2010,
-			height: (55 * scale)/2814,
+			x: (x + (30 * scale)) / 2010,
+			y: (y + (52 * scale)) / 2814,
+			width: (190 * scale) / 2010,
+			height: (55 * scale) / 2814,
 			oneLine: true,
 			font: 'gothambold',
 			color: 'white',
-			size: (55 * scale)/2010,
+			size: (55 * scale) / 2010,
 			align: 'center'
 		};
 
 		var total = {
-			name:"Number",
+			name: "Number",
 			text: '{kerning3}' + card.serialTotal || '',
-			x: (x+(251 * scale))/2010,
-			y: (y+(52 * scale))/2814,
-			width: (190 * scale)/2010,
-			height: (55 * scale)/2814,
+			x: (x + (251 * scale)) / 2010,
+			y: (y + (52 * scale)) / 2814,
+			width: (190 * scale) / 2010,
+			height: (55 * scale) / 2814,
 			oneLine: true,
 			font: 'gothambold',
 			color: 'white',
-			size: (55 * scale)/2010,
+			size: (55 * scale) / 2010,
 			align: 'center'
 		};
 
@@ -3141,13 +3141,13 @@ function drawCard() {
 	if (!card.noCorners && (card.marginX == 0 && card.marginY == 0)) {
 		var w = card.version == 'battle' ? 2100 : getStandardWidth();
 
-		cardContext.drawImage(corner, 0, 0, scaleWidth(59/w), scaleWidth(59/w));
+		cardContext.drawImage(corner, 0, 0, scaleWidth(59 / w), scaleWidth(59 / w));
 		cardContext.rotate(Math.PI / 2);
-		cardContext.drawImage(corner, 0, -card.width, scaleWidth(59/w), scaleWidth(59/w));
+		cardContext.drawImage(corner, 0, -card.width, scaleWidth(59 / w), scaleWidth(59 / w));
 		cardContext.rotate(Math.PI / 2);
-		cardContext.drawImage(corner, -card.width, -card.height, scaleWidth(59/w), scaleWidth(59/w));
+		cardContext.drawImage(corner, -card.width, -card.height, scaleWidth(59 / w), scaleWidth(59 / w));
 		cardContext.rotate(Math.PI / 2);
-		cardContext.drawImage(corner, -card.height, 0, scaleWidth(59/w), scaleWidth(59/w));
+		cardContext.drawImage(corner, -card.height, 0, scaleWidth(59 / w), scaleWidth(59 / w));
 		cardContext.rotate(Math.PI / 2);
 	}
 	// show preview
@@ -3155,13 +3155,13 @@ function drawCard() {
 	previewContext.drawImage(cardCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
 
 	if (window.cardDrawingPromiseResolver) {
-        window.cardDrawingPromiseResolver();
-        window.cardDrawingPromiseResolver = null;
+		window.cardDrawingPromiseResolver();
+		window.cardDrawingPromiseResolver = null;
 	}
 }
 //DOWNLOADING
 function downloadCard(alt = false, jpeg = false) {
-	if (card.infoArtist.replace(/ /g, '') == '' && !card.artSource.includes('/img/blank.png') && !card.artZoom == 0) {
+	if (card.infoArtist.replace(/ /g, '') == '' && !card.artSource.includes('img/blank.png') && !card.artZoom == 0) {
 		notify('You must credit an artist before downloading!', 5);
 	} else {
 		// Prep file information
@@ -3177,7 +3177,7 @@ function downloadCard(alt = false, jpeg = false) {
 		// Download image
 		if (alt) {
 			const newWindow = window.open('about:blank');
-			setTimeout(function(){
+			setTimeout(function () {
 				newWindow.document.body.appendChild(newWindow.document.createElement('img')).src = imageDataURL;
 				newWindow.document.querySelector('img').style = 'max-height: 100vh; max-width: 100vw;';
 				newWindow.document.body.style = 'padding: 0; margin: 0; text-align: center; background-color: #888;';
@@ -3195,125 +3195,125 @@ function downloadCard(alt = false, jpeg = false) {
 	}
 }
 async function bulkDownloadZip() {
-    // 1. Initial checks for libraries and saved cards.
-    if (typeof JSZip === 'undefined') {
-        notify('Required library (JSZip) has not loaded yet. Please wait a moment and try again.', 5);
-        return;
-    }
-    const cardKeys = JSON.parse(localStorage.getItem('cardKeys'));
-    if (!cardKeys || cardKeys.length === 0) {
-        notify('No saved cards found to download.', 3);
-        return;
-    }
+	// 1. Initial checks for libraries and saved cards.
+	if (typeof JSZip === 'undefined') {
+		notify('Required library (JSZip) has not loaded yet. Please wait a moment and try again.', 5);
+		return;
+	}
+	const cardKeys = JSON.parse(localStorage.getItem('cardKeys'));
+	if (!cardKeys || cardKeys.length === 0) {
+		notify('No saved cards found to download.', 3);
+		return;
+	}
 
-    let fileHandle = null;
-    let useStreaming = false;
+	let fileHandle = null;
+	let useStreaming = false;
 
-    // 2. Trigger the file picker immediately to capture the user gesture.
-    if (window.showSaveFilePicker) {
-        try {
-            notify('Please choose a location to save your ZIP file.', 15);
-            fileHandle = await window.showSaveFilePicker({
-                suggestedName: 'CardConjurer_Bulk.zip',
-                types: [{
-                    description: 'ZIP file',
-                    accept: { 'application/zip': ['.zip'] },
-                }],
-            });
-            useStreaming = true;
-        } catch (err) {
-            // This error occurs if the user clicks "Cancel" in the save dialog.
-            if (err.name === 'AbortError') {
-                notify('Save operation cancelled.', 3);
-                return; // Exit the function entirely if the user cancels.
-            }
-            // If another error occurs, fall back to the in-memory method.
-            console.error("Could not get file handle, falling back to in-memory method:", err);
-        }
-    }
+	// 2. Trigger the file picker immediately to capture the user gesture.
+	if (window.showSaveFilePicker) {
+		try {
+			notify('Please choose a location to save your ZIP file.', 15);
+			fileHandle = await window.showSaveFilePicker({
+				suggestedName: 'CardConjurer_Bulk.zip',
+				types: [{
+					description: 'ZIP file',
+					accept: { 'application/zip': ['.zip'] },
+				}],
+			});
+			useStreaming = true;
+		} catch (err) {
+			// This error occurs if the user clicks "Cancel" in the save dialog.
+			if (err.name === 'AbortError') {
+				notify('Save operation cancelled.', 3);
+				return; // Exit the function entirely if the user cancels.
+			}
+			// If another error occurs, fall back to the in-memory method.
+			console.error("Could not get file handle, falling back to in-memory method:", err);
+		}
+	}
 
-    // 3. Save the current state and prepare the zip object.
-    notify(`Preparing to process ${cardKeys.length} cards...`, 10);
-    const zip = new JSZip();
-    const tempKey = '__temp_current_card_state__';
-    const cardToSave = JSON.parse(JSON.stringify(card));
-    cardToSave.frames.forEach(frame => {
-        delete frame.image;
-        frame.masks.forEach(mask => delete mask.image);
-    });
-    localStorage.setItem(tempKey, JSON.stringify(cardToSave));
+	// 3. Save the current state and prepare the zip object.
+	notify(`Preparing to process ${cardKeys.length} cards...`, 10);
+	const zip = new JSZip();
+	const tempKey = '__temp_current_card_state__';
+	const cardToSave = JSON.parse(JSON.stringify(card));
+	cardToSave.frames.forEach(frame => {
+		delete frame.image;
+		frame.masks.forEach(mask => delete mask.image);
+	});
+	localStorage.setItem(tempKey, JSON.stringify(cardToSave));
 
-    // 4. Loop through each saved card to render and add it to the zip object.
-    for (const [index, key] of cardKeys.entries()) {
-        try {
+	// 4. Loop through each saved card to render and add it to the zip object.
+	for (const [index, key] of cardKeys.entries()) {
+		try {
 			notify(`Processing card ${index + 1} of ${cardKeys.length}: ${key}`, 1);
 
-            ImageLoadTracker.start();
-            FontLoadTracker.start();
-            await loadCard(key);
-            drawText();
-            
-            const imagePromise = ImageLoadTracker.waitForAll();
-            const fontPromise = FontLoadTracker.waitForAll();
-            await Promise.all([imagePromise, fontPromise]);
-            
-            await new Promise(resolve => setTimeout(resolve, 50));
-            drawCard();
-            
-            const imageName = getCardName() + '.png';
-            const imageData = cardCanvas.toDataURL('image/png').split(',')[1];
-            
-            zip.file(imageName, imageData, { base64: true });
-            console.log(`Zipped: ${imageName}`);
+			ImageLoadTracker.start();
+			FontLoadTracker.start();
+			await loadCard(key);
+			drawText();
 
-        } catch (error) {
-            console.error(`Failed to process and zip card "${key}":`, error);
-            notify(`Skipping card "${key}" due to an error.`, 3);
-        } finally {
-            ImageLoadTracker.stop();
-            FontLoadTracker.stop();
-        }
-    }
+			const imagePromise = ImageLoadTracker.waitForAll();
+			const fontPromise = FontLoadTracker.waitForAll();
+			await Promise.all([imagePromise, fontPromise]);
 
-    // 5. Generate and save the ZIP file using the appropriate method.
-    try {
-        if (useStreaming && fileHandle) {
-            // Ideal Path: Manually pump the JSZip stream to the WritableStream.
-            notify('Saving ZIP file to disk...', 10);
-            const writable = await fileHandle.createWritable();
+			await new Promise(resolve => setTimeout(resolve, 50));
+			drawCard();
 
-            await new Promise((resolve, reject) => {
-                const stream = zip.generateInternalStream({ type: 'uint8array', streamFiles: true });
-                
-                stream
-                    .on('data', (chunk) => { writable.write(chunk).catch(reject); })
-                    .on('end', () => { writable.close().then(resolve).catch(reject); })
-                    .on('error', (err) => { reject(err); })
-                    .resume();
-            });
-            notify('ZIP file saved successfully!', 5);
+			const imageName = getCardName() + '.png';
+			const imageData = cardCanvas.toDataURL('image/png').split(',')[1];
 
-        } else {
-            // Fallback Path: For browsers without streaming support.
-            notify('Streaming not supported. Building ZIP in memory... This may be slow or fail.', 10);
-            const content = await zip.generateAsync({ type: 'blob' });
-            
-            const downloadElement = document.createElement('a');
-            downloadElement.href = URL.createObjectURL(content);
-            downloadElement.download = 'CardConjurer_Bulk.zip';
-            document.body.appendChild(downloadElement);
-            downloadElement.click();
-            document.body.removeChild(downloadElement);
-        }
-    } catch (err) {
-        console.error('Failed to generate or save ZIP file:', err);
-        notify('An error occurred while saving the ZIP file.', 5);
-    }
-    
-    // 6. Restore the user's original card state.
-    await loadCard(tempKey);
-    localStorage.removeItem(tempKey);
-    console.log('Bulk download process finished. User state restored.');
+			zip.file(imageName, imageData, { base64: true });
+			console.log(`Zipped: ${imageName}`);
+
+		} catch (error) {
+			console.error(`Failed to process and zip card "${key}":`, error);
+			notify(`Skipping card "${key}" due to an error.`, 3);
+		} finally {
+			ImageLoadTracker.stop();
+			FontLoadTracker.stop();
+		}
+	}
+
+	// 5. Generate and save the ZIP file using the appropriate method.
+	try {
+		if (useStreaming && fileHandle) {
+			// Ideal Path: Manually pump the JSZip stream to the WritableStream.
+			notify('Saving ZIP file to disk...', 10);
+			const writable = await fileHandle.createWritable();
+
+			await new Promise((resolve, reject) => {
+				const stream = zip.generateInternalStream({ type: 'uint8array', streamFiles: true });
+
+				stream
+					.on('data', (chunk) => { writable.write(chunk).catch(reject); })
+					.on('end', () => { writable.close().then(resolve).catch(reject); })
+					.on('error', (err) => { reject(err); })
+					.resume();
+			});
+			notify('ZIP file saved successfully!', 5);
+
+		} else {
+			// Fallback Path: For browsers without streaming support.
+			notify('Streaming not supported. Building ZIP in memory... This may be slow or fail.', 10);
+			const content = await zip.generateAsync({ type: 'blob' });
+
+			const downloadElement = document.createElement('a');
+			downloadElement.href = URL.createObjectURL(content);
+			downloadElement.download = 'CardConjurer_Bulk.zip';
+			document.body.appendChild(downloadElement);
+			downloadElement.click();
+			document.body.removeChild(downloadElement);
+		}
+	} catch (err) {
+		console.error('Failed to generate or save ZIP file:', err);
+		notify('An error occurred while saving the ZIP file.', 5);
+	}
+
+	// 6. Restore the user's original card state.
+	await loadCard(tempKey);
+	localStorage.removeItem(tempKey);
+	console.log('Bulk download process finished. User state restored.');
 }
 //IMPORT/SAVE TAB
 function importCard(cardObject) {
@@ -3327,7 +3327,7 @@ function importCard(cardObject) {
 			var option = document.createElement('option');
 			var name = card.printed_name || card.name;
 			if (card.flavor_name) {
-				name += " (" + card.flavor_name +")";
+				name += " (" + card.flavor_name + ")";
 			} else if (card.printed_name) {
 				name += " (" + card.name + ")";
 			}
@@ -3341,434 +3341,434 @@ function importCard(cardObject) {
 			option.value = optionIndex;
 			importIndex.appendChild(option);
 		}
-		optionIndex ++;
+		optionIndex++;
 	});
 	changeCardIndex();
 }
 
 async function pasteCardText() {
 	try {
-    const text = await navigator.clipboard.readText();
-    console.log(text);
-    const card = scryfallCardFromText(text);
-    importCard([card]);
-  } catch (err) {
-    console.error('Failed to read clipboard text: ', err);
-    notify('Clipboard access failed. Did you click the button?');
-  }
+		const text = await navigator.clipboard.readText();
+		console.log(text);
+		const card = scryfallCardFromText(text);
+		importCard([card]);
+	} catch (err) {
+		console.error('Failed to read clipboard text: ', err);
+		notify('Clipboard access failed. Did you click the button?');
+	}
 }
 
 function scryfallCardFromText(text) {
 	var lines = text.trim().split("\n");
 
 	if (lines.count == 0) {
-  		return {};
+		return {};
 	}
 
 	lines = lines.map(item => item.trim()).filter(item => item != "");
 
-  	var name = lines.shift();
-  	var manaCost;
-  	var manaCostStartIndex = name.indexOf("{");
-  	if (manaCostStartIndex > 0) {
-  	  manaCost = name.substring(manaCostStartIndex).trim();
-  	  name = name.substring(0, manaCostStartIndex).trim();
-  	}
+	var name = lines.shift();
+	var manaCost;
+	var manaCostStartIndex = name.indexOf("{");
+	if (manaCostStartIndex > 0) {
+		manaCost = name.substring(manaCostStartIndex).trim();
+		name = name.substring(0, manaCostStartIndex).trim();
+	}
 
- 	 var cardObject = {
- 	   "name": name,
- 	   "lang": "en"
- 	 };
+	var cardObject = {
+		"name": name,
+		"lang": "en"
+	};
 
- 	 if (manaCost !== undefined) {
-  	  cardObject.mana_cost = manaCost;
- 	 }
+	if (manaCost !== undefined) {
+		cardObject.mana_cost = manaCost;
+	}
 
-  	if (lines.count == 0) {
-  	  return cardObject;
-  	}
+	if (lines.count == 0) {
+		return cardObject;
+	}
 
- 	 cardObject.type_line = lines.shift().trim();
+	cardObject.type_line = lines.shift().trim();
 
-  if (lines.count == 0) {
-    return cardObject;
-  }
+	if (lines.count == 0) {
+		return cardObject;
+	}
 
-  var regex = /[0-9+\-*]+\/[0-9+*]+/
-  var match = lines[lines.length-1].match(regex);
-  if (match) {
-    var pt = match[0].split("/");
-    cardObject.power = pt[0];
-    cardObject.toughness = pt[1];
-    lines.pop();
-  }
+	var regex = /[0-9+\-*]+\/[0-9+*]+/
+	var match = lines[lines.length - 1].match(regex);
+	if (match) {
+		var pt = match[0].split("/");
+		cardObject.power = pt[0];
+		cardObject.toughness = pt[1];
+		lines.pop();
+	}
 
-  if (lines.count == 0) {
-    return cardObject;
-  }
+	if (lines.count == 0) {
+		return cardObject;
+	}
 
-  cardObject.oracle_text = lines.join("\n");
+	cardObject.oracle_text = lines.join("\n");
 
-  return cardObject;
+	return cardObject;
 }
 
 function parseSagaAbilities(text) {
-  const stepsMap = {};
+	const stepsMap = {};
 
-  // Remove reminder text
-  const abilityText = text.replace(/^\(.*?\)\s*/, '');
+	// Remove reminder text
+	const abilityText = text.replace(/^\(.*?\)\s*/, '');
 
-  // Match "I — ability" or "I, II — ability"
-  const regex = /([IVX, ]+)\s+—\s+([^]+?)(?=(?:\n[IVX, ]+\s+—|$))/g;
+	// Match "I — ability" or "I, II — ability"
+	const regex = /([IVX, ]+)\s+—\s+([^]+?)(?=(?:\n[IVX, ]+\s+—|$))/g;
 
-  let match;
-  while ((match = regex.exec(abilityText)) !== null) {
-    const stepsRaw = match[1].split(',').map(s => s.trim());
-    const ability = match[2].trim();
+	let match;
+	while ((match = regex.exec(abilityText)) !== null) {
+		const stepsRaw = match[1].split(',').map(s => s.trim());
+		const ability = match[2].trim();
 
-    for (const step of stepsRaw) {
-      stepsMap[step] = ability;
-    }
-  }
+		for (const step of stepsRaw) {
+			stepsMap[step] = ability;
+		}
+	}
 
-  // Lore step order
-  const loreOrder = Array.from({ length: 24 }, (_, i) => romanNumeral(i + 1));
+	// Lore step order
+	const loreOrder = Array.from({ length: 24 }, (_, i) => romanNumeral(i + 1));
 
-  // Track deduplicated abilities in order with count of steps
-  const abilityMap = new Map();
+	// Track deduplicated abilities in order with count of steps
+	const abilityMap = new Map();
 
-  for (const step of loreOrder) {
-    const ability = stepsMap[step];
-    if (!ability) continue;
+	for (const step of loreOrder) {
+		const ability = stepsMap[step];
+		if (!ability) continue;
 
-    if (abilityMap.has(ability)) {
-      abilityMap.get(ability).steps += 1;
-    } else {
-      abilityMap.set(ability, { ability, steps: 1 });
-    }
-  }
+		if (abilityMap.has(ability)) {
+			abilityMap.get(ability).steps += 1;
+		} else {
+			abilityMap.set(ability, { ability, steps: 1 });
+		}
+	}
 
-  return Array.from(abilityMap.values());
+	return Array.from(abilityMap.values());
 }
 
 function extractSagaReminderText(text) {
-  const match = text.match(/^\([^)]*\)/);
-  return match ? match[0] : null;
+	const match = text.match(/^\([^)]*\)/);
+	return match ? match[0] : null;
 }
 
 function parseClassAbilities(text) {
-    const lines = text.split('\n'); // Split text into lines
-    const abilities = [];
-    let reminderText = '';
-    let currentLevel = 1;
+	const lines = text.split('\n'); // Split text into lines
+	const abilities = [];
+	let reminderText = '';
+	let currentLevel = 1;
 
-    // Check if the first line is reminder text
-    if (lines[0].startsWith('(')) {
-            reminderText = lines.shift(); // Extract reminder text
-    }
+	// Check if the first line is reminder text
+	if (lines[0].startsWith('(')) {
+		reminderText = lines.shift(); // Extract reminder text
+	}
 
-    // Process each line
-    for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
+	// Process each line
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i].trim();
 
-            // Check for "{cost}: Level X" format
-            const levelMatch = line.match(/^(\{.*?\}):\s*Level \d+/); // Match cost and level
-            if (levelMatch) {
-                    const cost = `${levelMatch[1]}:`; // Extract cost (e.g., "{G}")
-                    const ability = lines[i + 1]?.trim() || ''; // Get the next line as ability text
-                    abilities.push({ cost, ability });
-                    i++; // Skip the next line since it's already processed
-                    currentLevel++;
-            } else if (abilities.length === 0) {
-                    // Handle the first level's ability text without "Level" heading
-                    abilities.push({ cost: '', ability: line });
-            }
-    }
+		// Check for "{cost}: Level X" format
+		const levelMatch = line.match(/^(\{.*?\}):\s*Level \d+/); // Match cost and level
+		if (levelMatch) {
+			const cost = `${levelMatch[1]}:`; // Extract cost (e.g., "{G}")
+			const ability = lines[i + 1]?.trim() || ''; // Get the next line as ability text
+			abilities.push({ cost, ability });
+			i++; // Skip the next line since it's already processed
+			currentLevel++;
+		} else if (abilities.length === 0) {
+			// Handle the first level's ability text without "Level" heading
+			abilities.push({ cost: '', ability: line });
+		}
+	}
 
-    // Prepend reminder text to the first ability if it exists
-    if (reminderText && abilities.length > 0) {
-            abilities[0].ability = `${reminderText}{lns}{bar}{lns}${abilities[0].ability}`;
-    }
+	// Prepend reminder text to the first ability if it exists
+	if (reminderText && abilities.length > 0) {
+		abilities[0].ability = `${reminderText}{lns}{bar}{lns}${abilities[0].ability}`;
+	}
 
-    return abilities;
+	return abilities;
 }
 
 function parseMultiFacedCards(card) {
-    let [frontFace, backFace] = card.card_faces ?? []
-    
-    if (card.object === "card_face") {
-        // Battle cards: find faces from scryfallCard array
-        frontFace = card;
-        backFace = scryfallCard.find(face => 
-            face.object === "card_face" && 
-            face.name !== card.name
-        );
-    }
-    
-    if (!frontFace || !backFace) {
-        console.error('Could not find both faces for multi-faced card');
-        return null;
-    }
-    
-    // Single processing logic for both types
-    const faces = {
-        front: {
-            name: frontFace.name || '',
-            type: frontFace.type_line || '',
-            rules: frontFace.oracle_text || '',
-            mana: frontFace.mana_cost || '',
-            pt: frontFace.power ? `${frontFace.power}/${frontFace.toughness}` : '',
-            defense: frontFace.defense || '',
-            flavor: frontFace.flavor_text || ''
-        },
-        back: {
-            name: backFace.name || '',
-            type: backFace.type_line || '',
-            rules: backFace.oracle_text || '',
-            mana: backFace.mana_cost || '',
-            pt: backFace.power ? `${backFace.power}/${backFace.toughness}` : '',
-            defense: backFace.defense || '',
-            flavor: backFace.flavor_text || ''
-        }
-    };
-    
-    return faces;
+	let [frontFace, backFace] = card.card_faces ?? []
+
+	if (card.object === "card_face") {
+		// Battle cards: find faces from scryfallCard array
+		frontFace = card;
+		backFace = scryfallCard.find(face =>
+			face.object === "card_face" &&
+			face.name !== card.name
+		);
+	}
+
+	if (!frontFace || !backFace) {
+		console.error('Could not find both faces for multi-faced card');
+		return null;
+	}
+
+	// Single processing logic for both types
+	const faces = {
+		front: {
+			name: frontFace.name || '',
+			type: frontFace.type_line || '',
+			rules: frontFace.oracle_text || '',
+			mana: frontFace.mana_cost || '',
+			pt: frontFace.power ? `${frontFace.power}/${frontFace.toughness}` : '',
+			defense: frontFace.defense || '',
+			flavor: frontFace.flavor_text || ''
+		},
+		back: {
+			name: backFace.name || '',
+			type: backFace.type_line || '',
+			rules: backFace.oracle_text || '',
+			mana: backFace.mana_cost || '',
+			pt: backFace.power ? `${backFace.power}/${backFace.toughness}` : '',
+			defense: backFace.defense || '',
+			flavor: backFace.flavor_text || ''
+		}
+	};
+
+	return faces;
 }
 
 function parseLevelerCard(card) {
-    if (card.layout !== 'leveler' || !card.oracle_text) {
-        console.error('Not a valid leveler card');
-        return null;
-    }
+	if (card.layout !== 'leveler' || !card.oracle_text) {
+		console.error('Not a valid leveler card');
+		return null;
+	}
 
-    const oracleText = card.oracle_text;
-    
-    // Parse the oracle text sections
-    const sections = oracleText.split('\n');
-    
-    // Find level up cost (first line)
-    const levelUpMatch = sections[0].match(/Level up (.+?) \((.+?)\)/);
-    const levelUpCost = levelUpMatch ? levelUpMatch[1] : '';
-    const levelUpReminder = levelUpMatch ? levelUpMatch[2] : '';
-    
-    // Find level ranges and their content
-    const levelSections = [];
-    let currentSection = null;
-    
-    for (let i = 1; i < sections.length; i++) {
-        const line = sections[i];
-        
-        // Check if this line defines a level range
-        const levelMatch = line.match(/^LEVEL (.+)$/);
-        if (levelMatch) {
-            if (currentSection) {
-                levelSections.push(currentSection);
-            }
-            currentSection = {
-                levelRange: levelMatch[1],
-                content: []
-            };
-        } else if (currentSection && line.trim()) {
-            currentSection.content.push(line);
-        }
-    }
-    
-    // Add the last section if it exists
-    if (currentSection) {
-        levelSections.push(currentSection);
-    }
-    
-    // Extract data for each level
-    const parsedData = {
-        layout: 'leveler', // Add this line for consistency
-        name: card.name || '',
-        type: card.type_line || '',
-        mana: card.mana_cost || '',
-        basePT: card.power && card.toughness ? `${card.power}/${card.toughness}` : '',
-        levelUpCost: levelUpCost,
-        levelUpText: `Level up ${levelUpCost} {i}(${levelUpReminder}){/i}`,
-        levels: []
-    };
-    
-    // Process each level section
-    levelSections.forEach(section => {
-        const levelData = {
-            range: section.levelRange,
-            pt: '',
-            abilities: []
-        };
-        
-        // Look for P/T in the content (usually looks like "2/3")
-        const ptMatch = section.content.find(line => /^\d+\/\d+$/.test(line.trim()));
-        if (ptMatch) {
-            levelData.pt = ptMatch.trim();
-            // Remove P/T from abilities
-            levelData.abilities = section.content.filter(line => line.trim() !== ptMatch.trim());
-        } else {
-            levelData.abilities = section.content;
-        }
-        
-        // Join abilities into a single text block
-        levelData.rulesText = levelData.abilities.join('\n');
-        
-        parsedData.levels.push(levelData);
-    });
-    
-    return parsedData;
+	const oracleText = card.oracle_text;
+
+	// Parse the oracle text sections
+	const sections = oracleText.split('\n');
+
+	// Find level up cost (first line)
+	const levelUpMatch = sections[0].match(/Level up (.+?) \((.+?)\)/);
+	const levelUpCost = levelUpMatch ? levelUpMatch[1] : '';
+	const levelUpReminder = levelUpMatch ? levelUpMatch[2] : '';
+
+	// Find level ranges and their content
+	const levelSections = [];
+	let currentSection = null;
+
+	for (let i = 1; i < sections.length; i++) {
+		const line = sections[i];
+
+		// Check if this line defines a level range
+		const levelMatch = line.match(/^LEVEL (.+)$/);
+		if (levelMatch) {
+			if (currentSection) {
+				levelSections.push(currentSection);
+			}
+			currentSection = {
+				levelRange: levelMatch[1],
+				content: []
+			};
+		} else if (currentSection && line.trim()) {
+			currentSection.content.push(line);
+		}
+	}
+
+	// Add the last section if it exists
+	if (currentSection) {
+		levelSections.push(currentSection);
+	}
+
+	// Extract data for each level
+	const parsedData = {
+		layout: 'leveler', // Add this line for consistency
+		name: card.name || '',
+		type: card.type_line || '',
+		mana: card.mana_cost || '',
+		basePT: card.power && card.toughness ? `${card.power}/${card.toughness}` : '',
+		levelUpCost: levelUpCost,
+		levelUpText: `Level up ${levelUpCost} {i}(${levelUpReminder}){/i}`,
+		levels: []
+	};
+
+	// Process each level section
+	levelSections.forEach(section => {
+		const levelData = {
+			range: section.levelRange,
+			pt: '',
+			abilities: []
+		};
+
+		// Look for P/T in the content (usually looks like "2/3")
+		const ptMatch = section.content.find(line => /^\d+\/\d+$/.test(line.trim()));
+		if (ptMatch) {
+			levelData.pt = ptMatch.trim();
+			// Remove P/T from abilities
+			levelData.abilities = section.content.filter(line => line.trim() !== ptMatch.trim());
+		} else {
+			levelData.abilities = section.content;
+		}
+
+		// Join abilities into a single text block
+		levelData.rulesText = levelData.abilities.join('\n');
+
+		parsedData.levels.push(levelData);
+	});
+
+	return parsedData;
 }
 
 function parsePrototypeLayout(card) {
-    if (card.layout !== 'prototype' || !card.oracle_text) {
-        console.error('Not a valid prototype card');
-        return null;
-    }
+	if (card.layout !== 'prototype' || !card.oracle_text) {
+		console.error('Not a valid prototype card');
+		return null;
+	}
 
-    const oracleText = card.oracle_text;
-    
-    // Match the entire prototype line: "Prototype {1}{U}{U} — 2/1 (reminder text)"
-    const prototypeMatch = oracleText.match(/^Prototype (.+?) — (\d+)\/(\d+) \((.+?)\)/);
-    
-    if (!prototypeMatch) {
-        console.error('Could not parse prototype information');
-        return null;
-    }
-    
-    const prototypeCost = prototypeMatch[1];
-    const prototypePower = prototypeMatch[2];
-    const prototypeToughness = prototypeMatch[3];
-    const prototypeReminder = prototypeMatch[4];
-    
-    // Split by newlines and remove the first line (which contains the prototype)
-    const lines = oracleText.split('\n');
-    const mainRules = lines.slice(1).join('\n').trim();
-    
-    return {
-        layout: 'prototype',
-        name: card.name || '',
-        type: card.type_line || '',
-        mana: card.mana_cost || '',
-        basePT: card.power && card.toughness ? `${card.power}/${card.toughness}` : '',
-        rules: mainRules,
-        prototype: {
-            cost: prototypeCost,
-            pt: `${prototypePower}/${prototypeToughness}`,
-            reminderText: `Prototype ${prototypeCost} — ${prototypePower}/${prototypeToughness} {i}(${prototypeReminder}){/i}`
-        }
-    };
+	const oracleText = card.oracle_text;
+
+	// Match the entire prototype line: "Prototype {1}{U}{U} — 2/1 (reminder text)"
+	const prototypeMatch = oracleText.match(/^Prototype (.+?) — (\d+)\/(\d+) \((.+?)\)/);
+
+	if (!prototypeMatch) {
+		console.error('Could not parse prototype information');
+		return null;
+	}
+
+	const prototypeCost = prototypeMatch[1];
+	const prototypePower = prototypeMatch[2];
+	const prototypeToughness = prototypeMatch[3];
+	const prototypeReminder = prototypeMatch[4];
+
+	// Split by newlines and remove the first line (which contains the prototype)
+	const lines = oracleText.split('\n');
+	const mainRules = lines.slice(1).join('\n').trim();
+
+	return {
+		layout: 'prototype',
+		name: card.name || '',
+		type: card.type_line || '',
+		mana: card.mana_cost || '',
+		basePT: card.power && card.toughness ? `${card.power}/${card.toughness}` : '',
+		rules: mainRules,
+		prototype: {
+			cost: prototypeCost,
+			pt: `${prototypePower}/${prototypeToughness}`,
+			reminderText: `Prototype ${prototypeCost} — ${prototypePower}/${prototypeToughness} {i}(${prototypeReminder}){/i}`
+		}
+	};
 }
 
 function parseMutateLayout(card) {
-    if (card.layout !== 'mutate' || !card.oracle_text) {
-        console.error('Not a valid mutate card');
-        return null;
-    }
+	if (card.layout !== 'mutate' || !card.oracle_text) {
+		console.error('Not a valid mutate card');
+		return null;
+	}
 
-    const oracleText = card.oracle_text;
-    
-    // Match the mutate line: "Mutate {3}{B} (reminder text)"
-    const mutateMatch = oracleText.match(/^Mutate (.+?) \((.+?)\)/);
-    
-    if (!mutateMatch) {
-        console.error('Could not parse mutate information');
-        return null;
-    }
-    
-    const mutateCost = mutateMatch[1];
-    const mutateReminder = mutateMatch[2];
-    
-    // Split by newlines and remove the first line (which contains the mutate)
-    const lines = oracleText.split('\n');
-    const mainRules = lines.slice(1).join('\n').trim();
-    
-    return {
-        layout: 'mutate',
-        name: card.name || '',
-        type: card.type_line || '',
-        mana: card.mana_cost || '',
-        basePT: card.power && card.toughness ? `${card.power}/${card.toughness}` : '',
-        rules: mainRules,
-        mutate: {
-            cost: mutateCost,
-            reminderText: `Mutate ${mutateCost} {i}(${mutateReminder}){/i}`
-        }
-    };
+	const oracleText = card.oracle_text;
+
+	// Match the mutate line: "Mutate {3}{B} (reminder text)"
+	const mutateMatch = oracleText.match(/^Mutate (.+?) \((.+?)\)/);
+
+	if (!mutateMatch) {
+		console.error('Could not parse mutate information');
+		return null;
+	}
+
+	const mutateCost = mutateMatch[1];
+	const mutateReminder = mutateMatch[2];
+
+	// Split by newlines and remove the first line (which contains the mutate)
+	const lines = oracleText.split('\n');
+	const mainRules = lines.slice(1).join('\n').trim();
+
+	return {
+		layout: 'mutate',
+		name: card.name || '',
+		type: card.type_line || '',
+		mana: card.mana_cost || '',
+		basePT: card.power && card.toughness ? `${card.power}/${card.toughness}` : '',
+		rules: mainRules,
+		mutate: {
+			cost: mutateCost,
+			reminderText: `Mutate ${mutateCost} {i}(${mutateReminder}){/i}`
+		}
+	};
 }
 
 function parseVanguardLayout(card) {
-    if (card.layout !== 'vanguard' || !card.oracle_text) {
-        console.error('Not a valid vanguard card');
-        return null;
-    }
+	if (card.layout !== 'vanguard' || !card.oracle_text) {
+		console.error('Not a valid vanguard card');
+		return null;
+	}
 
-    return {
-        layout: 'vanguard',
-        name: card.name || '',
-        type: card.type_line || '',
-        rules: card.oracle_text || '',
-        flavor: card.flavor_text || '',
-        handModifier: card.hand_modifier || '',
-        lifeModifier: card.life_modifier || ''
-    };
+	return {
+		layout: 'vanguard',
+		name: card.name || '',
+		type: card.type_line || '',
+		rules: card.oracle_text || '',
+		flavor: card.flavor_text || '',
+		handModifier: card.hand_modifier || '',
+		lifeModifier: card.life_modifier || ''
+	};
 }
 
 function parseRollAbilities(text) {
-    // Check if this is a roll card
-    if (!text.toLowerCase().includes('roll a d20')) {
-        return null;
-    }
+	// Check if this is a roll card
+	if (!text.toLowerCase().includes('roll a d20')) {
+		return null;
+	}
 
-    let modifiedText = text;
-    const lines = text.split('\n');
-    
-    // Skip the first line ("Roll a d20.")
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        
-        // Match patterns like "1—9 | ability" or "20 | ability"
-        const rollMatch = line.match(/^(\d+(?:—\d+)?)\s*\|\s*(.+)$/);
-        if (rollMatch) {
-            const range = rollMatch[1];
-            const ability = rollMatch[2];
-            
-            // Replace the line with the roll tag format
-            const newLine = `{roll${range}} ${ability}`;
-            modifiedText = modifiedText.replace(line, newLine);
-        }
-    }
-    
-    return modifiedText;
+	let modifiedText = text;
+	const lines = text.split('\n');
+
+	// Skip the first line ("Roll a d20.")
+	for (let i = 1; i < lines.length; i++) {
+		const line = lines[i].trim();
+
+		// Match patterns like "1—9 | ability" or "20 | ability"
+		const rollMatch = line.match(/^(\d+(?:—\d+)?)\s*\|\s*(.+)$/);
+		if (rollMatch) {
+			const range = rollMatch[1];
+			const ability = rollMatch[2];
+
+			// Replace the line with the roll tag format
+			const newLine = `{roll${range}} ${ability}`;
+			modifiedText = modifiedText.replace(line, newLine);
+		}
+	}
+
+	return modifiedText;
 }
 
 function parseStationCard(oracleText) {
-    if (!oracleText || !oracleText.includes('Station')) {
-        return null;
-    }
+	if (!oracleText || !oracleText.includes('Station')) {
+		return null;
+	}
 
-    // Split the oracle text by STATION markers to get the pre-station text
-    const parts = oracleText.split(/STATION \d+\+/);
-    
-    // The first part is the pre-station text (before any STATION abilities)
-    let preStationText = parts[0].trim();
-    
-    // Format station reminder text with italics
-    preStationText = preStationText.replace(/Station (\([^)]+\))/g, 'Station {i}$1{/i}');
-    
-    // Updated regex to match new scryfall format: "10+ | ability text"
-    const stationRegex = /(\d+\+)\s*\|\s*([^\n]+)/g;
-    const stationAbilities = [];
-    
-    let match;
-    while ((match = stationRegex.exec(oracleText)) !== null) {
-        stationAbilities.push({
-            number: match[1], // e.g., "1+", "8+"
-            text: match[2].trim()
-        });
-    }
+	// Split the oracle text by STATION markers to get the pre-station text
+	const parts = oracleText.split(/STATION \d+\+/);
 
-    return {
-        preStationText: preStationText,
-        stationAbilities: stationAbilities
-    };
+	// The first part is the pre-station text (before any STATION abilities)
+	let preStationText = parts[0].trim();
+
+	// Format station reminder text with italics
+	preStationText = preStationText.replace(/Station (\([^)]+\))/g, 'Station {i}$1{/i}');
+
+	// Updated regex to match new scryfall format: "10+ | ability text"
+	const stationRegex = /(\d+\+)\s*\|\s*([^\n]+)/g;
+	const stationAbilities = [];
+
+	let match;
+	while ((match = stationRegex.exec(oracleText)) !== null) {
+		stationAbilities.push({
+			number: match[1], // e.g., "1+", "8+"
+			text: match[2].trim()
+		});
+	}
+
+	return {
+		preStationText: preStationText,
+		stationAbilities: stationAbilities
+	};
 }
 
 function changeCardIndex() {
@@ -3797,12 +3797,12 @@ function changeCardIndex() {
 				savedDescriptiveTexts[field] = card.text[field].text;
 			}
 		});
-	
+
 		// Clear all text fields
 		Object.keys(card.text).forEach(key => {
 			card.text[key].text = '';
 		});
-		
+
 		// Restore descriptive texts
 		Object.keys(savedDescriptiveTexts).forEach(field => {
 			if (card.text[field]) {
@@ -3825,10 +3825,10 @@ function changeCardIndex() {
 	if (card.text && card.text.reminder && (card.version === 'fuse' || card.version === 'room')) {
 		card.text.reminder.text = importedReminderText || savedFuseReminderText;
 	}
-		
+
 	//text
 	var langFontCode = "";
-	if (cardToImport.lang == "ph") {langFontCode = "{fontphyrexian}"}
+	if (cardToImport.lang == "ph") { langFontCode = "{fontphyrexian}" }
 	// Handle Multi Faced Card Layouts
 	const multiFacedVersions = ['flip', 'split', 'fuse', 'aftermath', 'adventure', 'omen', 'room', 'battle', 'transform', 'modal', 'prepare'];
 	const isMultiFacedVersion = multiFacedVersions.some(keyword => card.version.toLowerCase().includes(keyword));
@@ -3838,38 +3838,38 @@ function changeCardIndex() {
 			console.error('Failed to parse Multi Faced card data');
 			return;
 		}
-	
+
 		// Add artist info
 		if (cardToImport.artist) {
 			artistEdited(cardToImport.artist);
 		}
-	
+
 		// Handle art loading 
 		if (cardToImport.image_uris?.art_crop) {
 			uploadArt(cardToImport.image_uris.art_crop, 'autoFit');
 		}
-	
+
 		// Handle set symbol
 		if (!document.querySelector('#lockSetSymbolCode').checked) {
 			document.querySelector('#set-symbol-code').value = cardToImport.set;
 			document.querySelector('#set-symbol-rarity').value = cardToImport.rarity.slice(0, 1);
 			if (!document.querySelector('#lockSetSymbolURL').checked) {
-			fetchSetSymbol();
+				fetchSetSymbol();
 			}
 		}
-	
+
 		// Multi Faced card handling
 		// Update text fields based on card version
 		//Front Face (standard handling for all multi-faced cards)
 		if (card.text?.title && card.text?.mana) {
 			card.text.title.text = langFontCode + flipData.front.name;
-			card.text.type.text = langFontCode + flipData.front.type; 
+			card.text.type.text = langFontCode + flipData.front.type;
 			card.text.rules.text = langFontCode + flipData.front.rules;
 			if (flipData.front.flavor) {
 				card.text.rules.text += '{flavor}' + curlyQuotes(flipData.front.flavor.replace('\n', '{lns}'));
 			}
 			card.text.mana.text = flipData.front.mana || '';
-			
+
 			// Handle PT vs Defense based on card version
 			if (card.version === 'battle') {
 				// For battles, only the defense field is unique
@@ -3905,7 +3905,7 @@ function changeCardIndex() {
 				card.text.pt2.text = flipData.back.pt || '';
 			}
 		}
-		
+
 		// Handle pt2 for battle and transform front faces (cards without title2/mana2)
 		if ((card.version === 'battle' || card.version.includes('transform') || card.version.includes('Transform')) && card.text?.pt2) {
 			card.text.pt2.text = flipData.back.pt || '';
@@ -3914,14 +3914,14 @@ function changeCardIndex() {
 		if ((card.version.includes('transform') || card.version.includes('Transform')) && card.text?.reminder && flipData.back.pt) {
 			card.text.reminder.text = flipData.back.pt;
 		}
-	
+
 		textEdited();
 	}
 
 	// Handle Unique Layouts (Leveler, Prototype, Mutate, and Vanguard)
 	else if (['leveler', 'prototype', 'mutate', 'vanguard'].includes(cardToImport.layout) && ['leveler', 'prototype', 'mutate', 'vanguard'].includes(card.version)) {
 		let uniqueData;
-		
+
 		if (cardToImport.layout === 'leveler') {
 			uniqueData = parseLevelerCard(cardToImport);
 		} else if (cardToImport.layout === 'prototype') {
@@ -3956,15 +3956,15 @@ function changeCardIndex() {
 			card.text.title.text = langFontCode + uniqueData.name;
 			card.text.type.text = langFontCode + uniqueData.type;
 			card.text.mana.text = uniqueData.mana;
-			
+
 			// Base P/T
 			if (card.text.pt) {
 				card.text.pt.text = uniqueData.basePT;
 			}
-			
+
 			if (uniqueData.layout === 'leveler') {
 				card.text.levelup.text = langFontCode + uniqueData.levelUpText;
-				
+
 				// Level 1-2 data
 				if (uniqueData.levels[0]) {
 					const level1Data = uniqueData.levels[0];
@@ -3978,7 +3978,7 @@ function changeCardIndex() {
 						card.text.pt2.text = level1Data.pt;
 					}
 				}
-				
+
 				// Level 3+ data
 				if (uniqueData.levels[1]) {
 					const level2Data = uniqueData.levels[1];
@@ -4031,149 +4031,149 @@ function changeCardIndex() {
 		textEdited();
 	}
 
-else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station') && card.version.includes('station')) {
+	else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station') && card.version.includes('station')) {
 
-	// Clear existing station fields
-	if (card.text) {
-		['ability0', 'ability1', 'ability2'].forEach(field => {
-			if (card.text[field]) card.text[field].text = '';
+		// Clear existing station fields
+		if (card.text) {
+			['ability0', 'ability1', 'ability2'].forEach(field => {
+				if (card.text[field]) card.text[field].text = '';
+			});
+		}
+
+		// Clear station badge values immediately
+		if (card.station?.badgeValues) {
+			card.station.badgeValues[1] = '';
+			card.station.badgeValues[2] = '';
+		}
+
+		const stationData = parseStationCard(cardToImport.oracle_text);
+		const name = (cardToImport.printed_name || cardToImport.name || '').replace(/^A-/, '{alchemy}');
+
+		// Populate basic text fields
+		const basicFields = [
+			['title', curlyQuotes(name)],
+			['type', cardToImport.type_line],
+			['mana', cardToImport.mana_cost || ''],
+			['pt', cardToImport.power && cardToImport.toughness ? `${cardToImport.power}/${cardToImport.toughness}` : '']
+		];
+
+		basicFields.forEach(([field, value]) => {
+			if (card.text?.[field]) card.text[field].text = langFontCode + value;
 		});
-	}
-	
-	// Clear station badge values immediately
-	if (card.station?.badgeValues) {
-		card.station.badgeValues[1] = '';
-		card.station.badgeValues[2] = '';
-	}
-	
-	const stationData = parseStationCard(cardToImport.oracle_text);
-	const name = (cardToImport.printed_name || cardToImport.name || '').replace(/^A-/, '{alchemy}');
 
-	// Populate basic text fields
-	const basicFields = [
-		['title', curlyQuotes(name)],
-		['type', cardToImport.type_line],
-		['mana', cardToImport.mana_cost || ''],
-		['pt', cardToImport.power && cardToImport.toughness ? `${cardToImport.power}/${cardToImport.toughness}` : '']
-	];
-	
-	basicFields.forEach(([field, value]) => {
-		if (card.text?.[field]) card.text[field].text = langFontCode + value;
-	});
-	
-	// Station ability placement logic
-	if (stationData) {
-		// Better regex to separate pre-text from Station reminder text
-		let preText = '';
-		let reminderText = '';
-		
-		if (stationData.preStationText) {
-			// Look for Station reminder text (either already italicized or not)
-			const stationReminderMatch = stationData.preStationText.match(/(.*?)(Station \{i\}\([^)]+\)\{\/i\}|Station \([^)]+\))/s);
-			
-			if (stationReminderMatch) {
-				preText = stationReminderMatch[1].trim();
-				
-				// Format the reminder text with italics if not already done
-				if (stationReminderMatch[2].includes('{i}')) {
-					reminderText = stationReminderMatch[2];
+		// Station ability placement logic
+		if (stationData) {
+			// Better regex to separate pre-text from Station reminder text
+			let preText = '';
+			let reminderText = '';
+
+			if (stationData.preStationText) {
+				// Look for Station reminder text (either already italicized or not)
+				const stationReminderMatch = stationData.preStationText.match(/(.*?)(Station \{i\}\([^)]+\)\{\/i\}|Station \([^)]+\))/s);
+
+				if (stationReminderMatch) {
+					preText = stationReminderMatch[1].trim();
+
+					// Format the reminder text with italics if not already done
+					if (stationReminderMatch[2].includes('{i}')) {
+						reminderText = stationReminderMatch[2];
+					} else {
+						reminderText = stationReminderMatch[2].replace(/Station (\([^)]+\))/, 'Station {i}$1{/i}');
+					}
 				} else {
-					reminderText = stationReminderMatch[2].replace(/Station (\([^)]+\))/, 'Station {i}$1{/i}');
+					// If no Station reminder found, treat entire text as pre-text
+					preText = stationData.preStationText.trim();
 				}
-			} else {
-				// If no Station reminder found, treat entire text as pre-text
-				preText = stationData.preStationText.trim();
+			}
+
+			const numAbilities = stationData.stationAbilities.length;
+
+			// AUTO-CHECK DISABLE FIRST SQUARE FOR SINGLE ABILITIES
+			const shouldDisableFirstSquare = numAbilities === 1;
+
+			// Define placement scenarios as configuration
+			const scenarios = {
+				// [hasPreText, numAbilities]: [ability0, ability1, ability2, badgeSlots]
+				[false + ',' + 1]: ['', reminderText, stationData.stationAbilities[0]?.text, [null, stationData.stationAbilities[0]?.number]],
+				[true + ',' + 1]: [preText, reminderText, stationData.stationAbilities[0]?.text, [null, stationData.stationAbilities[0]?.number]],
+				[false + ',' + 2]: [reminderText, stationData.stationAbilities[0]?.text, stationData.stationAbilities[1]?.text, [stationData.stationAbilities[0]?.number, stationData.stationAbilities[1]?.number]],
+				[true + ',' + 2]: [preText + (reminderText ? '\n' + reminderText : ''), stationData.stationAbilities[0]?.text, stationData.stationAbilities[1]?.text, [stationData.stationAbilities[0]?.number, stationData.stationAbilities[1]?.number]]
+			};
+
+			const scenario = scenarios[Boolean(preText) + ',' + numAbilities];
+			if (scenario) {
+				const [ability0, ability1, ability2, badges] = scenario;
+
+				// Set abilities
+				[ability0, ability1, ability2].forEach((text, i) => {
+					if (text && card.text[`ability${i}`]) {
+						card.text[`ability${i}`].text = langFontCode + text;
+					}
+				});
+
+				// Set disable first square checkbox and station setting
+				setTimeout(() => {
+					const disableCheckbox = document.querySelector('#station-disable-first-ability');
+					if (disableCheckbox) {
+						disableCheckbox.checked = shouldDisableFirstSquare;
+					}
+					if (card.station) {
+						card.station.disableFirstAbility = shouldDisableFirstSquare;
+					}
+
+					// SET STATION-SPECIFIC UI VALUES FOR SINGLE ABILITY IMPORTS
+					if (shouldDisableFirstSquare && !Boolean(preText) && card.station?.importSettings?.singleAbility) {
+						// Get version-specific settings or fall back to default
+						const versionOverrides = card.station.importSettings.versionOverrides || {};
+						const versionSettings = versionOverrides[card.version] || card.station.importSettings.singleAbility;
+
+						// Set Y offset
+						const yOffsetInput = document.querySelector('#station-square-y');
+						if (yOffsetInput) {
+							yOffsetInput.value = versionSettings.yOffset;
+							if (card.station.squares && card.station.squares[1]) {
+								card.station.squares[1].y = versionSettings.yOffset + 76;
+							}
+						}
+
+						// Set first square height
+						const height1Input = document.querySelector('#station-square-height-1');
+						if (height1Input) {
+							height1Input.value = versionSettings.height1;
+							if (card.station.squares && card.station.squares[1]) {
+								card.station.squares[1].height = versionSettings.height1;
+							}
+						}
+					}
+
+
+					// Clear DOM inputs first
+					['#station-badge-value-1', '#station-badge-value-2'].forEach(selector => {
+						const input = document.querySelector(selector);
+						if (input) input.value = '';
+					});
+
+					// Set new badge values
+					badges.forEach((badge, i) => {
+						if (badge) {
+							const input = document.querySelector(`#station-badge-value-${i + 1}`);
+							if (input) input.value = badge;
+							if (card.station?.badgeValues) card.station.badgeValues[i + 1] = badge;
+						}
+					});
+
+					// Force station redraw after all values are set
+					setTimeout(() => {
+						if (typeof stationEdited === 'function') {
+							stationEdited();
+						}
+					}, 50);
+				}, 100);
 			}
 		}
-		
-		const numAbilities = stationData.stationAbilities.length;
-		
-		// AUTO-CHECK DISABLE FIRST SQUARE FOR SINGLE ABILITIES
-		const shouldDisableFirstSquare = numAbilities === 1;
-		
-		// Define placement scenarios as configuration
-		const scenarios = {
-			// [hasPreText, numAbilities]: [ability0, ability1, ability2, badgeSlots]
-			[false + ',' + 1]: ['', reminderText, stationData.stationAbilities[0]?.text, [null, stationData.stationAbilities[0]?.number]],
-			[true + ',' + 1]: [preText, reminderText, stationData.stationAbilities[0]?.text, [null, stationData.stationAbilities[0]?.number]],
-			[false + ',' + 2]: [reminderText, stationData.stationAbilities[0]?.text, stationData.stationAbilities[1]?.text, [stationData.stationAbilities[0]?.number, stationData.stationAbilities[1]?.number]],
-			[true + ',' + 2]: [preText + (reminderText ? '\n' + reminderText : ''), stationData.stationAbilities[0]?.text, stationData.stationAbilities[1]?.text, [stationData.stationAbilities[0]?.number, stationData.stationAbilities[1]?.number]]
-		};
-		
-		const scenario = scenarios[Boolean(preText) + ',' + numAbilities];
-		if (scenario) {
-			const [ability0, ability1, ability2, badges] = scenario;
-			
-			// Set abilities
-			[ability0, ability1, ability2].forEach((text, i) => {
-				if (text && card.text[`ability${i}`]) {
-					card.text[`ability${i}`].text = langFontCode + text;
-				}
-			});
-			
-			// Set disable first square checkbox and station setting
-			setTimeout(() => {
-				const disableCheckbox = document.querySelector('#station-disable-first-ability');
-				if (disableCheckbox) {
-					disableCheckbox.checked = shouldDisableFirstSquare;
-				}
-				if (card.station) {
-					card.station.disableFirstAbility = shouldDisableFirstSquare;
-				}
-				
-				// SET STATION-SPECIFIC UI VALUES FOR SINGLE ABILITY IMPORTS
-				if (shouldDisableFirstSquare && !Boolean(preText) && card.station?.importSettings?.singleAbility) {
-					// Get version-specific settings or fall back to default
-					const versionOverrides = card.station.importSettings.versionOverrides || {};
-					const versionSettings = versionOverrides[card.version] || card.station.importSettings.singleAbility;
-					
-					// Set Y offset
-					const yOffsetInput = document.querySelector('#station-square-y');
-					if (yOffsetInput) {
-						yOffsetInput.value = versionSettings.yOffset;
-						if (card.station.squares && card.station.squares[1]) {
-							card.station.squares[1].y = versionSettings.yOffset + 76;
-						}
-					}
-					
-					// Set first square height
-					const height1Input = document.querySelector('#station-square-height-1');
-					if (height1Input) {
-						height1Input.value = versionSettings.height1;
-						if (card.station.squares && card.station.squares[1]) {
-							card.station.squares[1].height = versionSettings.height1;
-						}
-					}
-				}
-		
-				
-				// Clear DOM inputs first
-				['#station-badge-value-1', '#station-badge-value-2'].forEach(selector => {
-					const input = document.querySelector(selector);
-					if (input) input.value = '';
-				});
-				
-				// Set new badge values
-				badges.forEach((badge, i) => {
-					if (badge) {
-						const input = document.querySelector(`#station-badge-value-${i + 1}`);
-						if (input) input.value = badge;
-						if (card.station?.badgeValues) card.station.badgeValues[i + 1] = badge;
-					}
-				});
-				
-				// Force station redraw after all values are set
-				setTimeout(() => {
-					if (typeof stationEdited === 'function') {
-						stationEdited();
-					}
-				}, 50);
-			}, 100);
-		}
+
+		textEdited();
 	}
-	
-	textEdited();
-}
 
 	var name = cardToImport.printed_name || cardToImport.name || '';
 	if (name.startsWith('A-')) { name = name.replace('A-', '{alchemy}'); }
@@ -4184,8 +4184,8 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 			var index = name.indexOf(', ');
 
 			if (index > 0) {
-			  card.text.subtitle.text = langFontCode + curlyQuotes(name.substring(index+2));
-			  card.text.title.text = langFontCode + curlyQuotes(name.substring(0, index+1));
+				card.text.subtitle.text = langFontCode + curlyQuotes(name.substring(index + 2));
+				card.text.title.text = langFontCode + curlyQuotes(name.substring(0, index + 1));
 			} else {
 				card.text.title.text = langFontCode + curlyQuotes(name);
 				card.text.subtitle.text = '';
@@ -4195,40 +4195,40 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 		}
 	}
 
-	if (card.text.nickname) {card.text.nickname.text = cardToImport.flavor_name || '';}
-	if (card.text.mana) {card.text.mana.text = cardToImport.mana_cost || '';}
-	if (card.text.type) {card.text.type.text = langFontCode + cardToImport.type_line || '';}
+	if (card.text.nickname) { card.text.nickname.text = cardToImport.flavor_name || ''; }
+	if (card.text.mana) { card.text.mana.text = cardToImport.mana_cost || ''; }
+	if (card.text.type) { card.text.type.text = langFontCode + cardToImport.type_line || ''; }
 
 	var italicExemptions = ['Boast', 'Cycling', 'Visit', 'Prize', 'I', 'II', 'III', 'IV', 'I, II', 'II, III', 'III, IV', 'I, II, III', 'II, III, IV', 'I, II, III, IV', '• Khans', '• Dragons', '• Mirran', '• Phyrexian', 'Prototype', 'Companion', 'To solve', 'Solved'];
 	var italicExemptions = ['Boast', 'Cycling', 'Visit', 'Prize', 'I', 'II', 'III', 'IV', 'I, II', 'II, III', 'III, IV', 'I, II, III', 'II, III, IV', 'I, II, III, IV', '• Khans', '• Dragons', '• Mirran', '• Phyrexian', 'Prototype', 'Companion', 'To solve', 'Solved'];
 	if (cardToImport.oracle_text) {
-		const hasRoll = cardToImport.oracle_text.toLowerCase().includes('roll a d20');		
-		const hasNumberedAbilities = /\d+(?:—\d+)?\s*\|\s*.+/.test(cardToImport.oracle_text);		
+		const hasRoll = cardToImport.oracle_text.toLowerCase().includes('roll a d20');
+		const hasNumberedAbilities = /\d+(?:—\d+)?\s*\|\s*.+/.test(cardToImport.oracle_text);
 		const rollText = parseRollAbilities(cardToImport.oracle_text);
 		if (rollText) {
 			// Use the modified text with roll tags for further processing
-			var rulesText = rollText.replace(/(?:\((?:.*?)\)|[^"\n]+(?= — ))/g, function(a){
-				if (italicExemptions.includes(a) || (cardToImport.keywords && cardToImport.keywords.indexOf('Spree') != -1 && a.startsWith('+'))) {return a;}
+			var rulesText = rollText.replace(/(?:\((?:.*?)\)|[^"\n]+(?= — ))/g, function (a) {
+				if (italicExemptions.includes(a) || (cardToImport.keywords && cardToImport.keywords.indexOf('Spree') != -1 && a.startsWith('+'))) { return a; }
 				return '{i}' + a + '{/i}';
 			});
 		} else {
 			// Regular processing for non-roll cards
-			var rulesText = (cardToImport.oracle_text || '').replace(/(?:\((?:.*?)\)|[^"\n]+(?= — ))/g, function(a){
-				if (italicExemptions.includes(a) || (cardToImport.keywords && cardToImport.keywords.indexOf('Spree') != -1 && a.startsWith('+'))) {return a;}
+			var rulesText = (cardToImport.oracle_text || '').replace(/(?:\((?:.*?)\)|[^"\n]+(?= — ))/g, function (a) {
+				if (italicExemptions.includes(a) || (cardToImport.keywords && cardToImport.keywords.indexOf('Spree') != -1 && a.startsWith('+'))) { return a; }
 				return '{i}' + a + '{/i}';
 			});
 		}
 		// Handle loyalty ability brackets - separate from roll handling, applies to ALL cards
-		const isCleaveSpell = rulesText.toLowerCase().includes('cleave') || 
-							 (cardToImport.keywords && cardToImport.keywords.includes('Cleave'));
-		
+		const isCleaveSpell = rulesText.toLowerCase().includes('cleave') ||
+			(cardToImport.keywords && cardToImport.keywords.includes('Cleave'));
+
 		if (!isCleaveSpell) {
-		// Replace loyalty ability brackets [+1], [-2], etc. with curly brackets
-		// Also convert em dash (−) to regular hyphen (-)
-		rulesText = rulesText.replace(/\[([+\-−]\d+)\]/g, function(match, number) {
-			return '{' + number.replace('\u2212', '-') + '}';
-		});
-	}
+			// Replace loyalty ability brackets [+1], [-2], etc. with curly brackets
+			// Also convert em dash (−) to regular hyphen (-)
+			rulesText = rulesText.replace(/\[([+\-−]\d+)\]/g, function (match, number) {
+				return '{' + number.replace('\u2212', '-') + '}';
+			});
+		}
 	} else {
 		var rulesText = '';
 	}
@@ -4283,7 +4283,7 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 					flavorText = flavorText.replace('*', '{i}');
 					flavorText = flavorText.replace('"', '\u201d');
 				}
-				flavorTextCounter ++;
+				flavorTextCounter++;
 			}
 
 			if (card.version == 'pokemon') {
@@ -4314,20 +4314,20 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 			card.text.middleStat.text = '{' + (cardToImport.power || '') + '}';
 			card.text.pt.text = '{' + (cardToImport.toughness || '') + '}';
 
-			if (card.text.middleStat && card.text.middleStat.text == '{}') {card.text.middleStat.text = '';}
+			if (card.text.middleStat && card.text.middleStat.text == '{}') { card.text.middleStat.text = ''; }
 		} else {
 			card.text.pt.text = cardToImport.power + '/' + cardToImport.toughness || '';
 		}
 	}
-	if (card.text.pt && card.text.pt.text == undefined + '/' + undefined) {card.text.pt.text = '';}
-	if (card.text.pt && card.text.pt.text == undefined + '\n' + undefined) {card.text.pt.text = '';}
-	if (card.text.pt && card.text.pt.text == '{}') {card.text.pt.text = '';}
+	if (card.text.pt && card.text.pt.text == undefined + '/' + undefined) { card.text.pt.text = ''; }
+	if (card.text.pt && card.text.pt.text == undefined + '\n' + undefined) { card.text.pt.text = ''; }
+	if (card.text.pt && card.text.pt.text == '{}') { card.text.pt.text = ''; }
 	if (card.version.includes('planeswalker')) {
 		card.text.loyalty.text = cardToImport.loyalty || '';
 		var planeswalkerAbilities = cardToImport.oracle_text.split('\n');
 		// Replace loyalty ability brackets [+1], [-2], etc. with curly brackets for each ability
 		planeswalkerAbilities = planeswalkerAbilities.map(ability => {
-			return ability.replace(/\[([+\-−]\d+)\]/g, function(match, number) {
+			return ability.replace(/\[([+\-−]\d+)\]/g, function (match, number) {
 				return '{' + number.replace('\u2212', '-') + '}';
 			});
 		});
@@ -4335,7 +4335,7 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 			var newAbility = planeswalkerAbilities[planeswalkerAbilities.length - 2] + '\n' + planeswalkerAbilities.pop();
 			planeswalkerAbilities[planeswalkerAbilities.length - 1] = newAbility;
 		}
-		for (var i = 0; i < 4; i ++) {
+		for (var i = 0; i < 4; i++) {
 			if (planeswalkerAbilities[i]) {
 				var planeswalkerAbility = planeswalkerAbilities[i].replace(': ', 'splitstring').split('splitstring');
 				if (!planeswalkerAbility[1]) {
@@ -4366,7 +4366,7 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 			card.text[`ability${i}`].text = abilities[i].ability.replace('(', '{i}(').replace(')', '){/i}');
 		}
 		card.text.reminder.text = `{i}${extractSagaReminderText(cardToImport.oracle_text)}{/i}`;
-		card.saga = {...card.saga, abilities: abilities.map(a => a.steps).concat(Array.from({ length: 4 - abilities.length}, () => 0)), count: abilities.length};
+		card.saga = { ...card.saga, abilities: abilities.map(a => a.steps).concat(Array.from({ length: 4 - abilities.length }, () => 0)), count: abilities.length };
 		updateAbilityHeights()
 	} else if (card.version.toLowerCase().includes('class') && !card.version.includes('classicshifted') && typeof classCanvas !== "undefined") {
 		if (card.text.flavor) {
@@ -4384,7 +4384,7 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 			}
 			card.text[`level${i}c`].text = ability.replace('(', '{i}(').replace(')', '){/i}');
 		}
-		card.class = {...card.class, abilities: abilities.map(a => a.cost).concat(Array.from({ length: 4 - abilities.length}, () => '')), count: abilities.length};
+		card.class = { ...card.class, abilities: abilities.map(a => a.cost).concat(Array.from({ length: 4 - abilities.length }, () => '')), count: abilities.length };
 	} else if (card.version.includes('battle')) {
 		card.text.defense.text = cardToImport.defense || '';
 	}
@@ -4392,8 +4392,8 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 	document.querySelector('#text-editor-font-size').value = 0;
 	//font size
 	Object.keys(card.text).forEach(key => {
-			card.text[key].fontSize = 0;
-		});
+		card.text[key].fontSize = 0;
+	});
 	textEdited();
 	//collector's info
 	if (localStorage.getItem('enableImportCollectorInfo') == 'true') {
@@ -4402,7 +4402,7 @@ else if (cardToImport.oracle_text && cardToImport.oracle_text.includes('Station'
 		document.querySelector('#info-set').value = (cardToImport.set || "").toUpperCase();
 		document.querySelector('#info-language').value = (cardToImport.lang || "").toUpperCase();
 		var setXhttp = new XMLHttpRequest();
-		setXhttp.onreadystatechange = function() {
+		setXhttp.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
 				var setObject = JSON.parse(this.responseText)
 				if (document.querySelector('#enableNewCollectorStyle').checked) {
@@ -4498,7 +4498,7 @@ function saveCard(saveFromFile) {
 	}
 	if (!saveFromFile) {
 		cardKey = prompt('Enter the name you would like to save your card under:', cardKey);
-		if (!cardKey) {return null;}
+		if (!cardKey) { return null; }
 	}
 	cardKey = cardKey.trim();
 	if (cardKeys.includes(cardKey)) {
@@ -4507,7 +4507,7 @@ function saveCard(saveFromFile) {
 			var cardKeyNumber = 1;
 			while (cardKeys.includes(cardKey)) {
 				cardKey = originalCardKey + ' (' + cardKeyNumber + ')';
-				cardKeyNumber ++;
+				cardKeyNumber++;
 			}
 		}
 	}
@@ -4624,10 +4624,10 @@ async function downloadSavedCards() {
 	if (cardKeys) {
 		var allSavedCards = [];
 		cardKeys.forEach(item => {
-			allSavedCards.push({key:item, data:JSON.parse(localStorage.getItem(item))});
+			allSavedCards.push({ key: item, data: JSON.parse(localStorage.getItem(item)) });
 		});
 		var download = document.createElement('a');
-		download.href = URL.createObjectURL(new Blob([JSON.stringify(allSavedCards)], {type:'text'}));
+		download.href = URL.createObjectURL(new Blob([JSON.stringify(allSavedCards)], { type: 'text' }));
 		download.download = 'saved-cards.cardconjurer';
 		document.body.appendChild(download);
 		await download.click();
@@ -4743,20 +4743,20 @@ async function imageLocal(event, destination, otherParams) {
 		destination(reader.result, otherParams);
 	}
 	reader.onerror = function () {
-		destination('/img/blank.png', otherParams);
+		destination('img/blank.png', otherParams);
 	}
 	await reader.readAsDataURL(event.target.files[0]);
 }
 function loadScript(scriptPath) {
 	return new Promise((resolve, reject) => {
-	var script = document.createElement('script');
-	script.setAttribute('type', 'text/javascript');
-	script.onload = resolve;
-	script.onerror = function(){
-		notify('A script failed to load, likely due to an update. Please reload your page. Sorry for the inconvenience.');
-		reject();
-	}
-	script.setAttribute('src', (typeof basePath !== 'undefined' ? basePath : '') + scriptPath);
+		var script = document.createElement('script');
+		script.setAttribute('type', 'text/javascript');
+		script.onload = resolve;
+		script.onerror = function () {
+			notify('A script failed to load, likely due to an update. Please reload your page. Sorry for the inconvenience.');
+			reject();
+		}
+		script.setAttribute('src', (typeof basePath !== 'undefined' ? basePath : '') + scriptPath);
 		document.querySelectorAll('head')[0].appendChild(script);
 	});
 }
@@ -4765,7 +4765,7 @@ function stretchSVG(frameObject) {
 	xhr = new XMLHttpRequest();
 	xhr.open('GET', fixUri(frameObject.src), true);
 	xhr.overrideMimeType('image/svg+xml');
-	xhr.onload = function(e) {
+	xhr.onload = function (e) {
 		if (this.readyState == 4 && this.status == 200) {
 			frameObject.image.src = 'data:image/svg+xml;charset=utf-8,' + stretchSVGReal((new XMLSerializer).serializeToString(this.responseXML.documentElement), frameObject);
 		}
@@ -4781,11 +4781,11 @@ function stretchSVGReal(data, frameObject) {
 		const oldData = returnData.split(name + '" d="')[1].split('" style=')[0];
 		var newData = '';
 		const listData = oldData.split(/(?=[clmz])/gi);
-		for (i = 0; i < listData.length; i ++) {
+		for (i = 0; i < listData.length; i++) {
 			const item = listData[i];
 			if (targets.includes(i) || targets.includes(-i)) {
 				let sign = 1;
-				if (i != 0 && targets.includes(-i)) {sign = -1};
+				if (i != 0 && targets.includes(-i)) { sign = -1 };
 				if (item[0] == 'C' || item[0] == 'c') {
 					newCoords = [];
 					item.slice(1).split(' ').forEach(pair => {
@@ -4812,7 +4812,7 @@ function processScryfallCard(card, responseCards) {
 			face.rarity = card.rarity;
 			face.collector_number = card.collector_number;
 			face.lang = card.lang;
-      face.layout = card.layout; // Add layout from parent card
+			face.layout = card.layout; // Add layout from parent card
 			if (card.lang != 'en' || face.printed_name) {
 				face.oracle_text = face.printed_text || face.oracle_text;
 				face.name = face.printed_name || face.name;
@@ -4839,7 +4839,7 @@ function processScryfallCard(card, responseCards) {
 
 function fetchScryfallCardByID(scryfallID, callback = console.log) {
 	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
+	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			responseCards = [];
 			importedCards = [JSON.parse(this.responseText)];
@@ -4861,7 +4861,7 @@ function fetchScryfallCardByID(scryfallID, callback = console.log) {
 
 function fetchScryfallCardByCodeNumber(code, number, callback = console.log) {
 	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
+	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			responseCards = [];
 			importedCards = [JSON.parse(this.responseText)];
@@ -4884,7 +4884,7 @@ function fetchScryfallCardByCodeNumber(code, number, callback = console.log) {
 //SCRYFALL STUFF MAY BE CHANGED IN THE FUTURE
 function fetchScryfallData(cardName, callback = console.log, unique = '') {
 	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
+	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			responseCards = [];
 			importedCards = JSON.parse(this.responseText).data;
@@ -4927,10 +4927,10 @@ function toggleTextTag(tag) {
 	var suffix = text.substring(end);
 
 	if (prefix.endsWith(openTag) && suffix.startsWith(closeTag)) {
-		prefix = prefix.substring(0, prefix.length-openTag.length);
+		prefix = prefix.substring(0, prefix.length - openTag.length);
 		suffix = suffix.substring(closeTag.length);
 	} else if (selection.startsWith(openTag) && selection.endsWith(closeTag)) {
-		selection = selection.substring(openTag.length, selection.length-closeTag.length);
+		selection = selection.substring(openTag.length, selection.length - closeTag.length);
 	} else {
 		selection = openTag + selection + closeTag;
 	}
@@ -4962,7 +4962,7 @@ if ('number' in defaultCollector) {
 	document.querySelector('#info-rarity').value = defaultCollector.rarity;
 	document.querySelector('#info-set').value = defaultCollector.setCode;
 	document.querySelector('#info-language').value = defaultCollector.lang;
-	if (defaultCollector.starDot) {setTimeout(function(){defaultCollector.starDot = false; toggleStarDot();}, 500);}
+	if (defaultCollector.starDot) { setTimeout(function () { defaultCollector.starDot = false; toggleStarDot(); }, 500); }
 } else {
 	document.querySelector('#info-number').value = date.getFullYear();
 }
@@ -5029,7 +5029,7 @@ bindInputs('#frame-editor-hsl-lightness', '#frame-editor-hsl-lightness-slider');
 bindInputs('#show-guidelines', '#show-guidelines-2', true);
 
 // Load / init whatever
-loadScript('/js/frames/groupStandard-3.js');
+loadScript('js/frames/groupStandard-3.js');
 loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
 loadAvailableCards();
 initDraggableArt();

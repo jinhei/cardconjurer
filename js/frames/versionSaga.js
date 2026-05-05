@@ -1,6 +1,6 @@
 //checks to see if it needs to run
-if (!loadedVersions.includes('/js/frames/versionSaga.js')) {
-	loadedVersions.push('/js/frames/versionSaga.js');
+if (!loadedVersions.includes('js/frames/versionSaga.js')) {
+	loadedVersions.push('js/frames/versionSaga.js');
 	sizeCanvas('saga');
 	document.querySelector('#creator-menu-tabs').innerHTML += '<h3 class="selectable readable-background" onclick="toggleCreatorTabs(event, `saga`)">Saga</h3>';
 	var newHTML = document.createElement('div');
@@ -31,21 +31,21 @@ if (!loadedVersions.includes('/js/frames/versionSaga.js')) {
 		</div>
 	</div>`;
 	if (!card.saga) {
-		card.saga = {abilities:[1, 1, 1, 0], count:3, x:(card.version === "oldSaga" ? 0.1114 : 0.1), width:(card.version === "oldSaga" ? 0.3727 : 0.3947)};
+		card.saga = { abilities: [1, 1, 1, 0], count: 3, x: (card.version === "oldSaga" ? 0.1114 : 0.1), width: (card.version === "oldSaga" ? 0.3727 : 0.3947) };
 	} else {
 		card.saga.x = (card.version === "oldSaga" ? 0.1114 : 0.1);
 		card.saga.width = (card.version === "oldSaga" ? 0.3727 : 0.3947);
 	}
 	document.querySelector('#creator-menu-sections').appendChild(newHTML);
 	var sagaChapter = new Image();
-	setImageUrl(sagaChapter, '/img/frames/saga/sagaChapter.png');
+	setImageUrl(sagaChapter, 'img/frames/saga/sagaChapter.png');
 	var sagaDivider = new Image();
-	setImageUrl(sagaDivider, '/img/frames/saga/sagaDivider.png');
+	setImageUrl(sagaDivider, 'img/frames/saga/sagaDivider.png');
 	sagaChapter.onload = sagaDivider.onload = sagaEdited;
 	updateAbilityHeights();
 } else {
 	if (!card.saga) {
-		card.saga = {abilities:[1, 1, 1, 0], count:3, x:(card.version === "oldSaga" ? 0.1114 : 0.1), width:(card.version === "oldSaga" ? 0.3727 : 0.3947)};
+		card.saga = { abilities: [1, 1, 1, 0], count: 3, x: (card.version === "oldSaga" ? 0.1114 : 0.1), width: (card.version === "oldSaga" ? 0.3727 : 0.3947) };
 	} else {
 		card.saga.x = (card.version === "oldSaga" ? 0.1114 : 0.1);
 		card.saga.width = (card.version === "oldSaga" ? 0.3727 : 0.3947);
@@ -61,11 +61,11 @@ function sagaEdited() {
 	card.saga.abilities[3] = document.querySelector('#saga-chapters-3').value;
 	card.saga.count = 0;
 	var lastY = card.text.ability0.y;
-	for (var i = 0; i < 4; i ++) {
+	for (var i = 0; i < 4; i++) {
 		card.text['ability' + i].y = lastY;
 		var height = parseFloat((parseInt(document.querySelector('#saga-height-' + i).value) / card.height).toFixed(4));
 		if (height > 0) {
-			card.saga.count ++;
+			card.saga.count++;
 		}
 		card.text['ability' + i].height = height;
 		lastY += height;
@@ -76,7 +76,7 @@ function sagaEdited() {
 	sagaContext.font = 'normal normal 550 ' + scaleHeight(0.0324) + 'px plantinsemibold';
 	sagaContext.textAlign = 'center';
 	var sagaCount = 1;
-	for (var i = 0; i < card.saga.count; i ++) {
+	for (var i = 0; i < card.saga.count; i++) {
 		var x = scaleX(card.saga.x);
 		var y = scaleY(card.text['ability' + i].y);
 		var width = scaleWidth(card.saga.width);
@@ -96,10 +96,10 @@ function sagaEdited() {
 			var centerOffset = (count - 1) / 2;
 
 			for (let j = 0; j < count; j++) {
-					let positionOffset = (j - centerOffset) * offset * 2;
+				let positionOffset = (j - centerOffset) * offset * 2;
 
-					sagaContext.drawImage(sagaChapter, numeralX, numeralY + positionOffset, numeralWidth, numeralHeight);
-					sagaContext.fillText(romanNumeral(sagaCount + j), numeralTextX, numeralTextY + positionOffset);
+				sagaContext.drawImage(sagaChapter, numeralX, numeralY + positionOffset, numeralWidth, numeralHeight);
+				sagaContext.fillText(romanNumeral(sagaCount + j), numeralTextX, numeralTextY + positionOffset);
 			}
 			sagaCount += count;
 		}
@@ -110,27 +110,27 @@ function sagaEdited() {
 
 function updateAbilityHeights() {
 	const maxHeight = card.text.type.y - card.text.ability0.y;
-	
+
 	// Get all saga abilities that have content
 	const abilities = [];
 	for (let i = 0; i < card.saga.count; i++) {
-	const abilityText = card.text[`ability${i}`].text;
-	// Count words excluding reminder text in parentheses
-	const wordCount = abilityText
-		.replace(/\([^)]*\)/g, '') // Remove reminder text
-		.trim()
-		.split(/\s+/)
-		.length;
-		
-	abilities.push({
-		index: i,
-		wordCount: wordCount
-	});
+		const abilityText = card.text[`ability${i}`].text;
+		// Count words excluding reminder text in parentheses
+		const wordCount = abilityText
+			.replace(/\([^)]*\)/g, '') // Remove reminder text
+			.trim()
+			.split(/\s+/)
+			.length;
+
+		abilities.push({
+			index: i,
+			wordCount: wordCount
+		});
 	}
 
 	// Calculate proportional heights
 	const totalWords = abilities.reduce((sum, a) => sum + a.wordCount, 0);
-	
+
 	// Add height constraint (minimum height)
 	const minHeight = maxHeight * 0.15; // 15% of max height
 	let availableHeight = maxHeight - (minHeight * abilities.length);
@@ -143,7 +143,7 @@ function updateAbilityHeights() {
 
 	// Set remaining abilities to 0 height
 	for (let i = card.saga.count; i < 4; i++) {
-	card.text[`ability${i}`].height = 0;
+		card.text[`ability${i}`].height = 0;
 	}
 
 	fixSagaInputs(sagaEdited);

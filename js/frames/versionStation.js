@@ -3,7 +3,7 @@
 //=====================================
 
 async function initializeStationFrame(frameType = 'regular', preservedData = null) {
-	
+
 	// Initialize station canvases
 	sizeCanvas('stationPreFrame');
 	sizeCanvas('stationPostFrame');
@@ -12,10 +12,10 @@ async function initializeStationFrame(frameType = 'regular', preservedData = nul
 	const existingStation = preservedData || card.station || {};
 	// Only preserve colors if NOT in auto mode (let auto mode regenerate from mana)
 	const isAutoMode = existingStation.colorModes?.[1] === 'auto' || !existingStation.colorModes?.[1];
-	
+
 	// Always preserve disableFirstAbility regardless of color mode
 	const preservedDisableFirstAbility = existingStation.disableFirstAbility;
-	
+
 	const preservedColors = (existingStation.squares && !isAutoMode) ? {
 		square1Color: existingStation.squares[1]?.color,
 		square2Color: existingStation.squares[2]?.color,
@@ -24,7 +24,7 @@ async function initializeStationFrame(frameType = 'regular', preservedData = nul
 		colorModes: existingStation.colorModes || {},
 		badgeValues: existingStation.badgeValues || ['', '', '']
 	} : null;
-	
+
 	// Wait for script to be loaded
 	if (!window.stationPreFrameContext) {
 		await new Promise(resolve => {
@@ -46,7 +46,7 @@ async function initializeStationFrame(frameType = 'regular', preservedData = nul
 			...card.station, // Keep the initialized defaults
 			...existingStation // Restore any existing customizations
 		};
-		
+
 		// Restore preserved colors if they existed
 		if (preservedColors && card.station.squares) {
 			if (preservedColors.square1Color) {
@@ -64,13 +64,13 @@ async function initializeStationFrame(frameType = 'regular', preservedData = nul
 				card.station.badgeValues = preservedColors.badgeValues;
 			}
 		}
-		
+
 		// Always restore disableFirstAbility regardless of color mode
 		if (preservedDisableFirstAbility !== undefined) {
 			card.station.disableFirstAbility = preservedDisableFirstAbility;
 		}
 	}
-	
+
 	// Apply frame-specific settings
 	if (card.station && card.station.squares) {
 		switch (frameType) {
@@ -91,17 +91,17 @@ async function initializeStationFrame(frameType = 'regular', preservedData = nul
 				break;
 		}
 	}
-	
+
 	// Update UI to reflect correct values
 	if (typeof fixStationInputs === 'function') {
 		fixStationInputs();
 	}
-	
+
 	// Only reset if we don't have preserved colors
 	if (!preservedColors && typeof resetStationSettings === 'function') {
 		resetStationSettings();
 	}
-	
+
 	// Only trigger color updates if we don't have preserved colors
 	if (!preservedColors) {
 		// Trigger color updates based on current mana
@@ -111,14 +111,14 @@ async function initializeStationFrame(frameType = 'regular', preservedData = nul
 			updateSquareColorsFromMana();
 		}
 	}
-	
+
 	// Trigger redraw
 	if (typeof stationEdited === 'function') {
 		setTimeout(() => {
 			stationEdited();
 		}, 50);
 	}
-	
+
 	return true;
 }
 
@@ -126,27 +126,27 @@ async function initializeStationFrame(frameType = 'regular', preservedData = nul
 // INITIALIZATION AND SETUP
 //=====================================
 
-if (!loadedVersions.includes('/js/frames/versionStation.js')) {
-	loadedVersions.push('/js/frames/versionStation.js');
-	
+if (!loadedVersions.includes('js/frames/versionStation.js')) {
+	loadedVersions.push('js/frames/versionStation.js');
+
 	sizeCanvas('stationPreFrame');
 	sizeCanvas('stationPostFrame');
-	
+
 	initializeStationImages();
 	initializeStationDefaults();
 	setupStationUI();
-	
+
 	// Set up property watchers
 	setupStationListeners();
-	
+
 	fixStationInputs(stationEdited);
 } else {
 	// Clear existing watchers before setting up new ones
 	clearStationListeners();
-	
+
 	// Set up fresh watchers
 	setupStationListeners();
-	
+
 	// Just refresh the UI inputs
 	fixStationInputs(stationEdited);
 }
@@ -154,10 +154,10 @@ if (!loadedVersions.includes('/js/frames/versionStation.js')) {
 // Override textEdited function to handle station-specific updates
 if (typeof window.originalTextEdited === 'undefined' && typeof textEdited === 'function') {
 	window.originalTextEdited = textEdited;
-	window.textEdited = function() {
+	window.textEdited = function () {
 		// Call the original function
 		window.originalTextEdited();
-		
+
 		// Add station-specific handling
 		if (typeof updateBadgeImageFromMana === 'function' && typeof updatePTImageFromMana === 'function') {
 			const textKey = Object.keys(card.text)[selectedTextIndex];
@@ -183,15 +183,15 @@ if (typeof window.originalTextEdited === 'undefined' && typeof textEdited === 'f
 function setupStationImage(imageName, imagePath, logName) {
 	const image = new Image();
 	image.crossOrigin = 'anonymous';
-	
+
 	const cachedImage = document.querySelector(`img[data-station-cache="${imageName}"]`);
 	if (cachedImage) return cachedImage;
-	
+
 	image.onload = () => {
 		image.setAttribute('data-station-cache', imageName);
 		stationEdited();
 	};
-	
+
 	setImageUrl(image, imagePath);
 	return image;
 }
@@ -206,7 +206,7 @@ function setInputValues(inputMap) {
 function extractManaSymbols(manaText) {
 	const matches = manaText.match(/\{([wubrg])\}/gi);
 	if (!matches) return [];
-	
+
 	const colorSymbols = new Set();
 	matches.forEach(match => {
 		const symbol = match.replace(/[{}]/g, '').toLowerCase();
@@ -214,7 +214,7 @@ function extractManaSymbols(manaText) {
 			colorSymbols.add(symbol);
 		}
 	});
-	
+
 	return Array.from(colorSymbols);
 }
 
@@ -232,8 +232,8 @@ function setupDrawingContext(context, settings = {}) {
 //=====================================
 
 function initializeStationImages() {
-	window.stationBadgeImage = setupStationImage('badge', '/img/frames/station/badges/a.png', 'Station badge');
-	window.stationPTImage = setupStationImage('pt', '/img/frames/station/pt/a.png', 'Station PT');
+	window.stationBadgeImage = setupStationImage('badge', 'img/frames/station/badges/a.png', 'Station badge');
+	window.stationPTImage = setupStationImage('pt', 'img/frames/station/pt/a.png', 'Station PT');
 }
 
 function initializeStationDefaults() {
@@ -278,8 +278,8 @@ function initializeStationDefaults() {
 			},
 			minDistanceFromBottom: 150,
 			baseTextPositions: {
-				ability1: {x: 0.18, y: 0.7},
-				ability2: {x: 0.18, y: 0.83}
+				ability1: { x: 0.18, y: 0.7 },
+				ability2: { x: 0.18, y: 0.83 }
 			},
 			textOffsets: {
 				1: { x: 85, y: 15 },
@@ -294,7 +294,7 @@ function initializeStationDefaults() {
 			}
 		};
 	}
-	
+
 	const defaults = {
 		badgeValues: ['', '', ''],
 		badgeSettings: { fontSize: 0.0250, width: 162, height: 162 },
@@ -313,10 +313,10 @@ function initializeStationDefaults() {
 			l: { square1: '#7c5439', square2: '#7c5439', square2OpacityOffset: 0.20 }
 		},
 		packDefaults: {
-			ability: { x: 175/2010, y: 1775/2814, width: 1660/2010, height: 280/2814 }
+			ability: { x: 175 / 2010, y: 1775 / 2814, width: 1660 / 2010, height: 280 / 2814 }
 		}
 	};
-	
+
 	Object.entries(defaults).forEach(([key, value]) => {
 		if (!card.station[key]) card.station[key] = value;
 	});
@@ -328,7 +328,7 @@ function initializeStationDefaults() {
 
 function setupStationUI() {
 	document.querySelector('#creator-menu-tabs').innerHTML += '<h3 class="selectable readable-background" onclick="toggleCreatorTabs(event, `station`)">Station</h3>';
-	
+
 	const newHTML = document.createElement('div');
 	newHTML.id = 'creator-menu-station';
 	newHTML.classList.add('hidden');
@@ -425,7 +425,7 @@ function setupStationUI() {
 			</button>
 		</div>
 	</div>`;
-	
+
 	document.querySelector('#creator-menu-sections').appendChild(newHTML);
 }
 
@@ -436,11 +436,11 @@ function setupStationUI() {
 function setupStationListeners() {
 	// Only set up if not already done
 	if (window.stationListenersInitialized) return;
-	
+
 	// Set up property watchers for mana and PT text changes
 	setupManaPropertyWatcher();
 	setupPTPropertyWatcher();
-	
+
 	window.stationListenersInitialized = true;
 }
 
@@ -450,27 +450,27 @@ function setupManaPropertyWatcher() {
 		console.warn('Mana text object not found for property watcher');
 		return;
 	}
-	
+
 	// Don't set up multiple watchers on the same object
 	if (card.text.mana._stationWatcherActive) {
 		return;
 	}
-	
+
 	// Save current value BEFORE deleting the property
 	let currentManaValue = card.text.mana.text || '';
-	
+
 	// Delete existing property so we can redefine it with getter/setter
 	delete card.text.mana.text;
-	
+
 	// Create a property descriptor that watches for changes
 	Object.defineProperty(card.text.mana, 'text', {
-		get: function() {
+		get: function () {
 			return this._textValue || '';
 		},
-		set: function(newValue) {
+		set: function (newValue) {
 			const oldValue = this._textValue || '';
 			this._textValue = newValue || '';
-			
+
 			// Only trigger updates if the value actually changed
 			if (oldValue !== this._textValue) {
 				// Debounce the updates to avoid excessive redraws
@@ -486,7 +486,7 @@ function setupManaPropertyWatcher() {
 		enumerable: true,
 		configurable: true
 	});
-	
+
 	// Initialize with current value
 	card.text.mana._textValue = currentManaValue;
 	card.text.mana._stationWatcherActive = true;
@@ -498,27 +498,27 @@ function setupPTPropertyWatcher() {
 		console.warn('PT text object not found for property watcher');
 		return;
 	}
-	
+
 	// Don't set up multiple watchers on the same object
 	if (card.text.pt._stationWatcherActive) {
 		return;
 	}
-	
+
 	// Save current value BEFORE deleting the property
 	let currentPTValue = card.text.pt.text || '';
-	
+
 	// Delete existing property so we can redefine it with getter/setter
 	delete card.text.pt.text;
-	
+
 	// Create a property descriptor that watches for changes
 	Object.defineProperty(card.text.pt, 'text', {
-		get: function() {
+		get: function () {
 			return this._textValue || '';
 		},
-		set: function(newValue) {
+		set: function (newValue) {
 			const oldValue = this._textValue || '';
 			this._textValue = newValue || '';
-			
+
 			// Only trigger updates if the value actually changed
 			if (oldValue !== this._textValue) {
 				// Debounce the updates to avoid excessive redraws
@@ -532,7 +532,7 @@ function setupPTPropertyWatcher() {
 		enumerable: true,
 		configurable: true
 	});
-	
+
 	// Initialize with current value
 	card.text.pt._textValue = currentPTValue;
 	card.text.pt._stationWatcherActive = true;
@@ -546,22 +546,22 @@ function clearStationListeners() {
 		delete card.text.mana._textValue;
 		delete card.text.mana._stationWatcherActive;
 		delete card.text.mana._stationManaUpdateTimeout;
-		
+
 		// Restore as simple property
 		card.text.mana.text = currentValue;
 	}
-	
+
 	if (card.text && card.text.pt && card.text.pt._stationWatcherActive) {
 		const currentValue = card.text.pt._textValue;
 		delete card.text.pt.text;
 		delete card.text.pt._textValue;
 		delete card.text.pt._stationWatcherActive;
 		delete card.text.pt._stationPTUpdateTimeout;
-		
+
 		// Restore as simple property
 		card.text.pt.text = currentValue;
 	}
-	
+
 	window.stationListenersInitialized = false;
 }
 
@@ -574,14 +574,14 @@ function handleColorMode(type, mode, colorSettings) {
 		white: 'w', blue: 'u', black: 'b', red: 'r', green: 'g',
 		multi: 'm', colorless: 'a', artifact: 'a', land: 'l'
 	};
-	
+
 	if (mode === 'auto') {
 		if (type === 'square') updateSquareColorsFromMana();
 		else if (type === 'badge') updateBadgeImageFromMana();
 		else if (type === 'pt') updatePTImageFromMana();
 	} else if (type !== 'square') {
 		const folderName = type === 'badge' ? 'badges' : type;
-		const imagePath = `/img/frames/station/${folderName}/${colorMap[mode] || 'a'}.png`;
+		const imagePath = `img/frames/station/${folderName}/${colorMap[mode] || 'a'}.png`;
 		const image = type === 'badge' ? stationBadgeImage : stationPTImage;
 		setImageUrl(image, imagePath);
 	} else {
@@ -610,16 +610,16 @@ function updatePTColorMode() {
 
 function updateImageFromMana(imageType, imageProp, colorModeProp) {
 	if (card.station[colorModeProp] !== 'auto' || !card.text?.mana) return;
-	
+
 	const manaSymbols = extractManaSymbols(card.text.mana.text || '');
 	let suffix = 'a';
-	
+
 	if (manaSymbols.length === 1) suffix = manaSymbols[0];
 	else if (manaSymbols.length > 1) suffix = 'm';
-	
-	const imagePath = `/img/frames/station/${imageType}/${suffix}.png`;
+
+	const imagePath = `img/frames/station/${imageType}/${suffix}.png`;
 	const image = window[imageProp];
-	
+
 	if (image && !image.src.endsWith(imagePath)) {
 		setImageUrl(image, imagePath);
 	}
@@ -640,7 +640,7 @@ function updatePTImageFromMana() {
 
 function fixStationInputs(callback) {
 	const borderlessOffset = card.station.borderlessXOffset || 0;
-	
+
 	const inputMap = {
 		'#station-disable-first-ability': card.station.disableFirstAbility || false,
 		'#station-badge-value-1': card.station.badgeValues[1] || '',
@@ -658,28 +658,28 @@ function fixStationInputs(callback) {
 		'#station-square-opacity-1': card.station.squares[1].opacity || 0.7,
 		'#station-square-opacity-2': card.station.squares[2].opacity || 0.7
 	};
-	
+
 	const disableCheckbox = document.querySelector('#station-disable-first-ability');
 	if (disableCheckbox) disableCheckbox.checked = inputMap['#station-disable-first-ability'];
 	delete inputMap['#station-disable-first-ability'];
-	
+
 	setInputValues(inputMap);
-	
+
 	const colorMode = document.querySelector('#station-square-color-mode');
 	const colorPicker = document.querySelector('#station-square-color-picker');
 	const opacity2Container = document.querySelector('#station-square-opacity-2-container');
 	const opacity1Label = document.querySelector('#station-square-opacity-1-label');
-	
+
 	if (colorMode) {
 		colorMode.value = card.station.colorModes[1] || 'auto';
 		const isCustom = card.station.colorModes[1] === 'custom';
 		const isAuto = card.station.colorModes[1] === 'auto';
-		
+
 		if (colorPicker) colorPicker.classList.toggle('hidden', !isCustom);
 		if (opacity2Container) opacity2Container.classList.toggle('hidden', isAuto);
 		if (opacity1Label) opacity1Label.textContent = isAuto ? 'Square Opacity:' : 'First Square Opacity:';
 	}
-	
+
 	if (callback) callback();
 }
 
@@ -689,24 +689,24 @@ function fixStationInputs(callback) {
 
 function updateStationTextPositions() {
 	if (!card.station?.baseTextPositions) return;
-	
+
 	let positionsChanged = false;
-	
+
 	if (card.text?.ability1 && card.station.squares[1]) {
 		const square = card.station.squares[1];
 		const basePos = card.station.baseTextPositions.ability1;
-		
+
 		if (!card.station.textOffsets) {
 			card.station.textOffsets = {
 				1: { x: square.width * 0.05, y: square.height * 0.05 },
 				2: { x: square.width * 0.05, y: square.height * 0.05 }
 			};
 		}
-		
+
 		let textWidth = (square.width * 0.9) / card.width;
 		const textHeight = (square.height * 0.9) / card.height;
 		let textX, textY;
-		
+
 		if (card.station.disableFirstAbility) {
 			textX = card.station.disabledTextX || 0.087; // Use completely separate X position and width when disabled
 			textWidth = card.station.disabledTextWidth || 0.825; // Use separate width setting instead of square calculation
@@ -716,43 +716,43 @@ function updateStationTextPositions() {
 			textX = basePos.x + (square.x + card.station.textOffsets[1].x - 214) / card.width;
 			textY = basePos.y + (square.y + card.station.textOffsets[1].y) / card.height;
 		}
-		
-		if (card.text.ability1.x !== textX || card.text.ability1.y !== textY || 
+
+		if (card.text.ability1.x !== textX || card.text.ability1.y !== textY ||
 			card.text.ability1.width !== textWidth || card.text.ability1.height !== textHeight) {
-			
+
 			Object.assign(card.text.ability1, { x: textX, y: textY, width: textWidth, height: textHeight });
 			positionsChanged = true;
 		}
 	}
-	
+
 	if (card.text?.ability2 && card.station.squares[2]) {
 		const square = card.station.squares[2];
 		const basePos = card.station.baseTextPositions.ability2;
-		
+
 		if (!card.station.textOffsets) {
 			card.station.textOffsets = {
 				1: { x: square.width * 0.05, y: square.height * 0.05 },
 				2: { x: square.width * 0.05, y: square.height * 0.05 }
 			};
 		}
-		
+
 		let textWidth = (square.width * 0.9) / card.width;
 		const textHeight = (square.height * 0.9) / card.height;
-		
+
 		const hasPT = card.text?.pt?.text?.trim();
 		if (hasPT) textWidth *= 0.865;
-		
+
 		const textX = basePos.x + (square.x + card.station.textOffsets[2].x - 214) / card.width;
 		const textY = basePos.y + (square.y + card.station.textOffsets[2].y) / card.height;
-		
-		if (card.text.ability2.x !== textX || card.text.ability2.y !== textY || 
+
+		if (card.text.ability2.x !== textX || card.text.ability2.y !== textY ||
 			card.text.ability2.width !== textWidth || card.text.ability2.height !== textHeight) {
-			
+
 			Object.assign(card.text.ability2, { x: textX, y: textY, width: textWidth, height: textHeight });
 			positionsChanged = true;
 		}
 	}
-	
+
 	if (positionsChanged) {
 		setTimeout(() => { if (typeof textEdited === 'function') textEdited(); }, 10);
 		setTimeout(() => { if (typeof drawCard === 'function') drawCard(); }, 20);
@@ -765,41 +765,41 @@ function updateStationTextPositions() {
 
 function stationEdited() {
 	if (!stationPreFrameContext || !stationPostFrameContext) return;
-	
+
 	if (!card.station.baseTextPositions) {
 		card.station.baseTextPositions = {
-			ability1: {x: 0.18, y: 0.7},
-			ability2: {x: 0.18, y: 0.83}
+			ability1: { x: 0.18, y: 0.7 },
+			ability2: { x: 0.18, y: 0.83 }
 		};
 	}
-	
+
 	// Consolidate all input processing into one loop
 	const inputElements = [
-		{id: '#station-badge-value-1', target: 'card.station.badgeValues[1]', type: 'value'},
-		{id: '#station-badge-value-2', target: 'card.station.badgeValues[2]', type: 'value'},
-		{id: '#station-disable-first-ability', target: 'card.station.disableFirstAbility', type: 'checked'},
-		{id: '#station-pt-x-offset', target: 'card.station.ptSettings.x', type: 'int'},
-		{id: '#station-pt-y-offset', target: 'card.station.ptSettings.y', type: 'int'},
-		{id: '#station-square-width', target: 'both-squares.width', type: 'int'},
-		{id: '#station-square-x', target: 'both-squares.x', type: 'int'},
-		{id: '#station-square-height-1', target: 'card.station.squares[1].height', type: 'int'},
-		{id: '#station-square-height-2', target: 'card.station.squares[2].height', type: 'int'},
-		{id: '#station-square-y', target: 'card.station.squares[1].y', type: 'int-offset-76'},
-		{id: '#station-square-opacity-1', target: 'card.station.squares[1].opacity', type: 'float'},
-		{id: '#station-square-opacity-2', target: 'card.station.squares[2].opacity', type: 'float'}
+		{ id: '#station-badge-value-1', target: 'card.station.badgeValues[1]', type: 'value' },
+		{ id: '#station-badge-value-2', target: 'card.station.badgeValues[2]', type: 'value' },
+		{ id: '#station-disable-first-ability', target: 'card.station.disableFirstAbility', type: 'checked' },
+		{ id: '#station-pt-x-offset', target: 'card.station.ptSettings.x', type: 'int' },
+		{ id: '#station-pt-y-offset', target: 'card.station.ptSettings.y', type: 'int' },
+		{ id: '#station-square-width', target: 'both-squares.width', type: 'int' },
+		{ id: '#station-square-x', target: 'both-squares.x', type: 'int' },
+		{ id: '#station-square-height-1', target: 'card.station.squares[1].height', type: 'int' },
+		{ id: '#station-square-height-2', target: 'card.station.squares[2].height', type: 'int' },
+		{ id: '#station-square-y', target: 'card.station.squares[1].y', type: 'int-offset-76' },
+		{ id: '#station-square-opacity-1', target: 'card.station.squares[1].opacity', type: 'float' },
+		{ id: '#station-square-opacity-2', target: 'card.station.squares[2].opacity', type: 'float' }
 	];
-	
+
 	const previousDisableState = card.station.disableFirstAbility;
-	
-	inputElements.forEach(({id, target, type}) => {
+
+	inputElements.forEach(({ id, target, type }) => {
 		const element = document.querySelector(id);
 		if (!element) return;
-		
+
 		let value = element[type === 'checked' ? 'checked' : 'value'];
 		if (type === 'int') value = parseInt(value) || 0;
 		if (type === 'int-offset-76') value = (parseInt(value) || 0) + 76;
 		if (type === 'float') value = parseFloat(value);
-		
+
 		if (target === 'both-squares.width') {
 			card.station.squares[1].width = value;
 			card.station.squares[2].width = value;
@@ -811,107 +811,107 @@ function stationEdited() {
 			eval(`${target} = value`);
 		}
 	});
-	
+
 	// Handle color picker
 	const colorInput = document.querySelector('#station-square-color');
 	if (colorInput && card.station.colorModes[1] === 'custom') {
 		card.station.squares[1].color = colorInput.value;
 		card.station.squares[2].color = colorInput.value;
 	}
-	
+
 	// Handle auto mode opacity linking - ADD THIS SECTION
 	const mode1 = card.station.colorModes[1];
 	const mode2 = card.station.colorModes[2];
-	
+
 	if (mode1 === 'auto' && mode2 === 'auto') {
 		// In auto mode, update second square opacity based on first square opacity
 		const manaText = card.text?.mana?.text || '';
 		const manaSymbols = extractManaSymbols(manaText);
-		
+
 		let colorKey = 'default';
 		if (manaSymbols.length === 1) colorKey = manaSymbols[0];
 		else if (manaSymbols.length > 1) colorKey = 'm';
-		
+
 		const colorSet = card.station.colorSettings[colorKey];
 		if (colorSet) {
 			const opacityOffset = colorSet.square2OpacityOffset || 0.2;
-			const newSecondOpacity = card.station.disableFirstAbility ? 
-				card.station.squares[1].opacity : 
+			const newSecondOpacity = card.station.disableFirstAbility ?
+				card.station.squares[1].opacity :
 				Math.min(1.0, card.station.squares[1].opacity + opacityOffset);
-			
+
 			card.station.squares[2].opacity = newSecondOpacity;
-			
+
 			// Update the hidden second opacity slider to reflect the calculated value
 			const opacityInput2 = document.querySelector('#station-square-opacity-2');
 			if (opacityInput2) opacityInput2.value = newSecondOpacity;
 		}
 	}
-	
+
 	// Handle disable state change
 	if (previousDisableState !== card.station.disableFirstAbility) {
 		if (mode2 === 'auto') updateSquareColorsFromMana();
 		else if (mode2 !== 'custom') applyPresetColor(2, mode2);
 		else {
-			const newOpacity = card.station.disableFirstAbility ? 
-				card.station.squares[1].opacity : 
+			const newOpacity = card.station.disableFirstAbility ?
+				card.station.squares[1].opacity :
 				Math.min(1.0, card.station.squares[1].opacity + 0.2);
 			card.station.squares[2].opacity = newOpacity;
 			const opacityInput2 = document.querySelector('#station-square-opacity-2');
 			if (opacityInput2) opacityInput2.value = newOpacity;
 		}
 	}
-	
+
 	// Auto-update square 2 Y position based on square 1 with maximum limit
 	const basePos1 = card.station.baseTextPositions.ability1;
 	const basePos2 = card.station.baseTextPositions.ability2;
 	const square1Bottom = scaleY(basePos1.y) + card.station.squares[1].y + card.station.squares[1].height;
 	const calculatedY = square1Bottom - scaleY(basePos2.y);
-	
+
 	// Set square 2 Y position
 	card.station.squares[2].y = calculatedY;
-	
+
 	// Calculate maximum height based on distance from bottom - USE VERSION-SPECIFIC OVERRIDE
 	let minDistanceFromBottom = card.station.minDistanceFromBottom || 300; // Default fallback
-	
+
 	// Check for version-specific override
 	if (card.station.importSettings?.versionOverrides?.[card.version]?.minDistanceFromBottom) {
 		minDistanceFromBottom = card.station.importSettings.versionOverrides[card.version].minDistanceFromBottom;
 	}
-	
+
 	// Account for margins by adding 80 to the minimum distance
 	if (card.margins) {
 		minDistanceFromBottom += 60;
 	}
-	
+
 	// Use scaleHeight for consistent scaling like planeswalker does
 	const scaledMinDistance = scaleHeight(minDistanceFromBottom / 2100); // Convert to relative then scale
 	const canvasHeight = stationPreFrameCanvas.height; // Use actual canvas height
-	
+
 	const maxAllowedBottom = canvasHeight - scaledMinDistance;
-	
+
 	// Always set square 2 height to the maximum allowed height
 	const maxHeight = maxAllowedBottom - (scaleY(basePos2.y) + card.station.squares[2].y);
 	card.station.squares[2].height = Math.max(50, maxHeight); // Minimum height of 50px
-	
+
 	// Update the UI input to reflect the calculated height
 	const heightInput = document.querySelector('#station-square-height-2');
 	if (heightInput) {
 		heightInput.value = card.station.squares[2].height;
 	}
-	
+
 	updateStationTextPositions();
-	
+
 	// Clear and redraw
-	[stationPreFrameContext, stationPostFrameContext].forEach(ctx => 
+	[stationPreFrameContext, stationPostFrameContext].forEach(ctx =>
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height));
-	
+
 	// Only draw square 1 if not disabled
 	if (!card.station.disableFirstAbility) {
 		drawStationSquare(1);
 	}
 	drawStationSquare(2);
-	
-	setupDrawingContext(stationPreFrameContext, {alpha: 1});
+
+	setupDrawingContext(stationPreFrameContext, { alpha: 1 });
 	drawStationBadges();
 	drawCard();
 }
@@ -923,18 +923,18 @@ function stationEdited() {
 function drawStationSquare(index) {
 	const square = card.station.squares[index];
 	const abilityName = `ability${index}`;
-	
+
 	// For square 1, check if it's disabled
 	if (index === 1 && card.station.disableFirstAbility) {
 		// Don't draw the square (make it transparent) but keep all other properties
 		return;
 	}
-	
+
 	if (square.enabled && card.text?.[abilityName]) {
 		const basePos = card.station.baseTextPositions[abilityName];
 		const squareX = scaleX(basePos.x) + (square.x - 214);
 		const squareY = scaleY(basePos.y) + square.y;
-		
+
 		stationPreFrameContext.fillStyle = square.color;
 		stationPreFrameContext.globalAlpha = square.opacity;
 		stationPreFrameContext.fillRect(squareX, squareY, square.width, square.height);
@@ -943,19 +943,25 @@ function drawStationSquare(index) {
 
 function drawStationBadges() {
 	setupDrawingContext(stationPostFrameContext);
-	
+
 	const elements = [
-		{type: 'badge', index: 1, key: 'ability1', image: stationBadgeImage, 
-		 settings: card.station.badgeSettings, 
-		 hasValue: () => card.station.badgeValues?.[1]?.trim() && /\d/.test(card.station.badgeValues[1])},
-		{type: 'badge', index: 2, key: 'ability2', image: stationBadgeImage, 
-		 settings: card.station.badgeSettings,
-		 hasValue: () => card.station.badgeValues?.[2]?.trim() && /\d/.test(card.station.badgeValues[2])},
-		{type: 'pt', index: 2, key: 'ability2', image: stationPTImage, 
-		 settings: card.station.ptSettings,
-		 hasValue: () => card.text?.pt?.text?.trim()}
+		{
+			type: 'badge', index: 1, key: 'ability1', image: stationBadgeImage,
+			settings: card.station.badgeSettings,
+			hasValue: () => card.station.badgeValues?.[1]?.trim() && /\d/.test(card.station.badgeValues[1])
+		},
+		{
+			type: 'badge', index: 2, key: 'ability2', image: stationBadgeImage,
+			settings: card.station.badgeSettings,
+			hasValue: () => card.station.badgeValues?.[2]?.trim() && /\d/.test(card.station.badgeValues[2])
+		},
+		{
+			type: 'pt', index: 2, key: 'ability2', image: stationPTImage,
+			settings: card.station.ptSettings,
+			hasValue: () => card.text?.pt?.text?.trim()
+		}
 	];
-	
+
 	elements.forEach(element => {
 		if (element.type === 'pt') {
 			stationPostFrameContext.font = scaleHeight(element.settings.fontSize) + 'px belerenbsc';
@@ -966,32 +972,32 @@ function drawStationBadges() {
 
 function drawStationElement(elementType, index, textKey, image, settings, hasValue) {
 	if (!hasValue()) return;
-	
+
 	const square = card.station.squares[index];
 	const basePos = card.station.baseTextPositions[textKey];
 	const squareX = scaleX(basePos.x) + (square.x - 214);
 	const squareY = scaleY(basePos.y) + square.y;
-	
+
 	const width = settings.width;
 	const height = settings.height;
-	const elementX = elementType === 'pt' ? 
-		squareX + square.width + (settings.x - 266) : 
+	const elementX = elementType === 'pt' ?
+		squareX + square.width + (settings.x - 266) :
 		squareX + (settings.x || -81);
 	const elementY = squareY + (square.height / 2) + (settings.y || 0);
-	
+
 	if (image?.complete && image.naturalWidth > 0) {
 		stationPostFrameContext.drawImage(image, elementX, elementY - (height / 2), width, height);
 	}
-	
+
 	const textXOffset = 3;
 	const textYOffset = elementType === 'pt' ? 7 : 5;
 	const textX = elementX + (width / 2) + textXOffset;
 	const textY = elementY + textYOffset;
-	
-	const textValue = elementType === 'pt' ? 
-		card.text.pt.text : 
+
+	const textValue = elementType === 'pt' ?
+		card.text.pt.text :
 		card.station.badgeValues[index];
-	
+
 	stationPostFrameContext.fillText(textValue, textX, textY);
 }
 
@@ -1001,42 +1007,42 @@ function drawStationElement(elementType, index, textKey, image, settings, hasVal
 
 function updateSquareColorsFromMana() {
 	if (!card.text?.mana || !card.station.colorSettings) return;
-	
+
 	const mode1 = card.station.colorModes[1];
 	const mode2 = card.station.colorModes[2];
-	
+
 	if (mode1 !== 'auto' && mode2 !== 'auto') return;
-	
+
 	const manaText = card.text.mana.text || '';
 	const manaSymbols = extractManaSymbols(manaText);
-	
+
 	let colorKey = 'default';
 	if (manaSymbols.length === 1) colorKey = manaSymbols[0];
 	else if (manaSymbols.length > 1) colorKey = 'm';
-	
+
 	const colorSet = card.station.colorSettings[colorKey];
 	if (!colorSet) return;
-	
+
 	const disableFirstAbility = card.station.disableFirstAbility;
 	let changesApplied = false;
-	
+
 	if (mode1 === 'auto' && card.station.squares[1].color !== colorSet.square1) {
 		card.station.squares[1].color = colorSet.square1;
 		changesApplied = true;
 	}
-	
+
 	if (mode2 === 'auto') {
 		const opacityOffset = colorSet.square2OpacityOffset || 0.2;
-		const newOpacity = disableFirstAbility ? 
-			card.station.squares[1].opacity : 
+		const newOpacity = disableFirstAbility ?
+			card.station.squares[1].opacity :
 			Math.min(1.0, card.station.squares[1].opacity + opacityOffset);
-		
-		if (card.station.squares[2].color !== colorSet.square1 || 
+
+		if (card.station.squares[2].color !== colorSet.square1 ||
 			Math.abs(card.station.squares[2].opacity - newOpacity) > 0.01) {
-			
+
 			card.station.squares[2].color = colorSet.square1;
 			card.station.squares[2].opacity = newOpacity;
-			
+
 			const opacityInput2 = document.querySelector('#station-square-opacity-2');
 			if (opacityInput2) opacityInput2.value = card.station.squares[2].opacity;
 			changesApplied = true;
@@ -1049,36 +1055,36 @@ function toggleSquareColorPicker() {
 	const colorPickerDiv = document.querySelector('#station-square-color-picker');
 	const opacity2Container = document.querySelector('#station-square-opacity-2-container');
 	const opacity1Label = document.querySelector('#station-square-opacity-1-label');
-	
+
 	if (!modeSelect || !colorPickerDiv) return;
-	
+
 	const mode = modeSelect.value;
 	card.station.colorModes[1] = mode;
 	card.station.colorModes[2] = mode;
-	
+
 	colorPickerDiv.classList.toggle('hidden', mode !== 'custom');
-	
+
 	if (mode !== 'custom') {
 		// Reset opacities to defaults when changing color modes
 		card.station.squares[1].opacity = 0.2; // Reset to default
 		card.station.squares[2].opacity = 0.4; // Reset to default
-		
+
 		// Update UI inputs to reflect reset values
 		const opacity1Input = document.querySelector('#station-square-opacity-1');
 		const opacity2Input = document.querySelector('#station-square-opacity-2');
 		if (opacity1Input) opacity1Input.value = card.station.squares[1].opacity;
 		if (opacity2Input) opacity2Input.value = card.station.squares[2].opacity;
-		
+
 		applyPresetColor(1, mode);
 		applyPresetColor(2, mode);
 	}
-	
+
 	if (opacity2Container && opacity1Label) {
 		const isAuto = mode === 'auto';
 		opacity2Container.classList.toggle('hidden', isAuto);
 		opacity1Label.textContent = isAuto ? 'Square Opacity:' : 'First Square Opacity:';
 	}
-	
+
 	stationEdited();
 }
 
@@ -1096,26 +1102,26 @@ function applyPresetColor(index, mode) {
 		artifact: colorSettings.a,
 		land: colorSettings.l
 	};
-	
+
 	if (mode === 'auto') {
 		updateSquareColorsFromMana();
 		return;
 	}
-	
+
 	const colorSet = colorMap[mode] || colorSettings.default;
 	const color = colorSet.square1;
 	const opacityOffset = colorSet.square2OpacityOffset || 0.2;
-	
+
 	card.station.squares[index].color = color;
-	
+
 	if (index === 2 && !card.station.disableFirstAbility) {
 		card.station.squares[2].opacity = Math.min(1.0, 0.2 + opacityOffset);
-		
+
 		const opacityInput = document.querySelector('#station-square-opacity-2');
 		if (opacityInput) opacityInput.value = card.station.squares[2].opacity;
 	} else if (index === 2 && card.station.disableFirstAbility) {
 		card.station.squares[2].opacity = 0.2;
-		
+
 		const opacityInput = document.querySelector('#station-square-opacity-2');
 		if (opacityInput) opacityInput.value = card.station.squares[2].opacity;
 	}
@@ -1129,22 +1135,22 @@ function resetStationSettings() {
 	const preservedBadgeValues = card.station?.badgeValues ? [...card.station.badgeValues] : ['', '', ''];
 	const preservedBorderlessOffset = card.station?.borderlessXOffset;
 	const preservedDisableFirstAbility = card.station?.disableFirstAbility;
-	
+
 	// Clear existing watchers before reset
 	clearStationListeners();
-	
+
 	delete card.station;
 	initializeStationDefaults();
 	card.station.badgeValues = preservedBadgeValues;
-	
+
 	// Restore disableFirstAbility
 	if (preservedDisableFirstAbility !== undefined) {
 		card.station.disableFirstAbility = preservedDisableFirstAbility;
 	}
-	
+
 	// Re-establish watchers after reset
 	setupStationListeners();
-	
+
 	fixStationInputs(() => {
 		if (card.text?.mana?.text) {
 			setTimeout(() => {

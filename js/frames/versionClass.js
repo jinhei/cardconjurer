@@ -1,6 +1,6 @@
 //checks to see if it needs to run
-if (!loadedVersions.includes('/js/frames/versionClass.js')) {
-	loadedVersions.push('/js/frames/versionClass.js');
+if (!loadedVersions.includes('js/frames/versionClass.js')) {
+	loadedVersions.push('js/frames/versionClass.js');
 	sizeCanvas('class');
 	document.querySelector('#creator-menu-tabs').innerHTML += '<h3 class="selectable readable-background" onclick="toggleCreatorTabs(event, `class`)">Class</h3>';
 	var newHTML = document.createElement('div');
@@ -34,20 +34,20 @@ if (!loadedVersions.includes('/js/frames/versionClass.js')) {
 } else {
 	fixClassInputs(classEdited);
 }
-	//placement for header
+//placement for header
 function getCardClass() {
-		switch (card.version) {
-			case 'classStoneCutterDeluxe': return {x: 0.5240, width: 0.400};
-			case 'class': return {x: 0.5014, width: 0.422};
-			default: return { x: 0.5014, width: 0.422};
-		}
-} 
-	//use correct header image
+	switch (card.version) {
+		case 'classStoneCutterDeluxe': return { x: 0.5240, width: 0.400 };
+		case 'class': return { x: 0.5014, width: 0.422 };
+		default: return { x: 0.5014, width: 0.422 };
+	}
+}
+//use correct header image
 function getHeaderPath() {
 	switch (card.version) {
-		case 'classStoneCutterDeluxe': return '/img/frames/custom/stoneCutter/stoneCutterDeluxe/class/headerGold.png';
-		case 'class': return '/img/frames/class/header.png';
-		default: return '/img/frames/class/header.png';
+		case 'classStoneCutterDeluxe': return 'img/frames/custom/stoneCutter/stoneCutterDeluxe/class/headerGold.png';
+		case 'class': return 'img/frames/class/header.png';
+		default: return 'img/frames/class/header.png';
 	}
 }
 
@@ -60,34 +60,34 @@ function classEdited() {
 	//gather data
 	let classCount = 0;
 	var lastY = card.text.level0c.y;
-	for (var i = 0; i < 4; i ++) {
-	 	var height = parseFloat((parseInt(document.querySelector('#class-height-' + i).value) / card.height).toFixed(4));
-	 	card.text['level' + i + 'c'].height = height || (i === 0 ? 1 : 0);
-	 	if (i > 0) {
-	 		if (height > 0) {
-				classCount ++;
-			 	card.text['level' + i + 'a'].y = lastY - 0.0361;
-			 	card.text['level' + i + 'b'].y = lastY - 0.0361;
-		 		card.text['level' + i + 'c'].y = lastY;
+	for (var i = 0; i < 4; i++) {
+		var height = parseFloat((parseInt(document.querySelector('#class-height-' + i).value) / card.height).toFixed(4));
+		card.text['level' + i + 'c'].height = height || (i === 0 ? 1 : 0);
+		if (i > 0) {
+			if (height > 0) {
+				classCount++;
+				card.text['level' + i + 'a'].y = lastY - 0.0361;
+				card.text['level' + i + 'b'].y = lastY - 0.0361;
+				card.text['level' + i + 'c'].y = lastY;
 			} else {
-		 		card.text['level' + i + 'a'].y = 2;
-		 		card.text['level' + i + 'b'].y = 2;
-		 		card.text['level' + i + 'c'].y = 2;
-		 	}
-	 	} else {
-	 		card.text['level0c'].height;
-	 	}
-	 	lastY += height + 0.0481;
+				card.text['level' + i + 'a'].y = 2;
+				card.text['level' + i + 'b'].y = 2;
+				card.text['level' + i + 'c'].y = 2;
+			}
+		} else {
+			card.text['level0c'].height;
+		}
+		lastY += height + 0.0481;
 	}
 	//draw to class canvas
 	classContext.clearRect(0, 0, classCanvas.width, classCanvas.height);
-	for (var i = 1; i <= classCount; i ++) {
+	for (var i = 1; i <= classCount; i++) {
 		if (i == classCount) {
 			finalHeight = 0.8368 - card.text['level' + i + 'c'].y;
 			if (finalHeight <= 0) {
 				finalHeight = 0.05;
 			}
-	 		card.text['level' + i + 'c'].height = finalHeight;
+			card.text['level' + i + 'c'].height = finalHeight;
 		}
 		var x = scaleX(card.class.x);
 		var y = scaleY(card.text['level' + i + 'c'].y);
